@@ -36,4 +36,5 @@ data Command   = Accelerate Direction Float
                | MoveRadar Degree
                  
                  
-type Bot = M (Bot, Command)
+type Bot = () -- M (Bot, Command)
+
