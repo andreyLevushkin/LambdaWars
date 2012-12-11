@@ -1,5 +1,10 @@
-module UI where
+module UI (showBoard) where
 
+import Text.Blaze.Svg (Svg)
+import Core (BotState, Bullet)
+
+showBoard :: [BotState] -> [Bullet] -> Svg
+showBoard = undefined
 
 renderSvg :: [BotState] -> [Bullet] -> Svg 
 renderSvg = undefined
