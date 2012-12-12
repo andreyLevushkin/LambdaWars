@@ -5,18 +5,46 @@ import Control.Monad.Reader
 
 import Core
 
+-- Looking around your enviroment - takes no time
+readRadar :: Arena ScanResult
+readRadar = asks snd
 
-scan :: Arena ScanResult
-scan = asks snd
+readVelocity :: Arena Velocity
+readvelocity = asks (botVelocity . fst)
 
-position :: Arena Point
-position = asks (botPosition . fst)
+readRadarPosition :: Arena Degree
+readRadarPosition = asks (botRadar . fst)
 
-velocity :: Arena Velocity
-velocity = asks (botVelocity . fst)
+readTturretPosition :: Arena Degree
+readTturretPosition = asks (botTurret .fst)
 
-radarPosition :: Arena Degree
-radarPosition = asks (botRadar . fst)
+readWallHit ::Arena Bool
+readWallHit = undefined
 
-turretPosition :: Arena Degree
-turretPosition = asks (botTurret .fst)
+-- Commands that take one tick
+cmdTurnRight :: Arena ()
+cmdTurnRight = undefined
+
+cmdTurnLeft :: Arena ()
+cmdTurnLeft = undefined
+
+cmdAccelerate :: Arena ()
+cmdAccelerate = undefined
+
+cmdDecelerate :: Arena ()
+cmdDecelerate = undefined
+
+cmdTurnRadarLeft :: Arena ()
+cmdTurnRadarLeft = undefined
+
+cmdTurnRadarRight :: Arena ()
+cmdTurnRadarRight = undefined
+
+cmdTurnTurretLeft :: Arena ()
+cmdTurnTurretLeft = undefined
+
+cmdTurnTurretRight :: Arena ()
+cmdTurnTurretRight = undefined
+
+cmdFire :: Arena ()
+cmdFire = undefined

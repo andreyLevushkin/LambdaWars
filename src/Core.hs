@@ -25,7 +25,7 @@ data ScanResult = BotFound  Float
 
 data World  = World [(Bot,BotState)] [Bullet]
   
-type Arena = Reader (BotState, ScanResult)
+
 
 data Direction = Vertical | Horizontal
 
@@ -36,5 +36,12 @@ data Command   = Accelerate Direction Float
                | MoveRadar Degree
                  
                  
-type Bot = () -- M (Bot, Command)
 
+
+-- The monad inside which the bots will run.
+newtype Arena a = Arena a
+instance Monad Arena where
+  -- TODO the monad for the arena
+
+
+newtype Bot = Bot { runBot :: Arena (Command, Bot)  }
