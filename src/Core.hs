@@ -24,7 +24,11 @@ data ScanResult = BotFound  Float
                 | NothingFound
 
 data World  = World [(Bot,BotState)] [Bullet]
-  
+
+-- TODO: actual useful Show instance, just for testing webserver currently
+instance Show World where
+  show = const "World"
+
 
 
 data Direction = Vertical | Horizontal
