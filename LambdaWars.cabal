@@ -35,8 +35,10 @@ test-suite tests
   main-is:          MainTestSuite.hs
   build-depends:    base
                   , HUnit
+                  , QuickCheck
                   , test-framework
                   , test-framework-hunit
+                  , test-framework-quickcheck2
                   -- Duplication!
                   , blaze-svg
                   , mtl
