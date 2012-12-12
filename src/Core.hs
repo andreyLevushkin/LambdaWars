@@ -17,7 +17,7 @@ data BotState = BotState {
 data Bullet = Bullet {
   bulletPosition :: Point,
   bulletVelocity :: Point
-  }
+  } deriving (Show)
               
 data ScanResult = BotFound  Float
                 | WallFound Float
