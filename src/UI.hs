@@ -19,12 +19,12 @@ renderBot = undefined
 
 renderBullet :: Bullet -> Svg
 renderBullet bullet =
-    let position = bulletPosition bullet
+    let (x,y) = bulletPosition bullet
     in
         circle
            ! class_ "bullet"
-           ! cx (fromString $ show $ fst $ position) -- eww
-           ! cy (fromString $ show $ snd $ position)
+           ! cx (toValue x)
+           ! cy (toValue y)
            ! r "5"
 
 server :: IO ()
