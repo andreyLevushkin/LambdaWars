@@ -28,3 +28,17 @@ executable LambdaWars
                , blaze-svg
                , mtl
 
+
+test-suite tests
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   tests, src
+  main-is:          MainTestSuite.hs
+  build-depends:    base
+                  , HUnit
+                  , QuickCheck
+                  , test-framework
+                  , test-framework-hunit
+                  , test-framework-quickcheck2
+                  -- Duplication!
+                  , blaze-svg
+                  , mtl
