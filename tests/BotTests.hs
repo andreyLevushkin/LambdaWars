@@ -2,6 +2,7 @@ module BotTests where
 
 import Control.Monad.Reader
 import Control.Monad.Cont
+import Control.Arrow
 
 import Core
 import Arena
@@ -22,7 +23,8 @@ bot2 = do
   bot2
 
 test = take 5 $ 
-       map (map botLastCmd . states) $ -- ^ strip out the command log
+       map (map (botBearing &&& botLastCmd) . states) $ -- ^ strip out bearing
+                                                        -- and command log
        iterate stepWorld $
        initWorld [bot1, bot2]
 
