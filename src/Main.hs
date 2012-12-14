@@ -9,7 +9,7 @@ serverLoop :: Broadcaster -> IO ()
 serverLoop broadcast = do
 	-- XXX: just stubbed out atm, wait 1 second then broadcast an empty world
 	threadDelay 1000000
-	broadcast $ World [] []
+	broadcast $ World [] [] undefined -- TODO bounding box
 	serverLoop broadcast
 
 main = do

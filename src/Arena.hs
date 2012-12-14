@@ -1,3 +1,4 @@
+{-# LANGUAGE ViewPatterns #-}
 module Arena where
 
 import Control.Monad.Reader.Class
@@ -12,6 +13,9 @@ readRadar = asks dashRadar
 
 readVelocity :: Arena Double
 readVelocity = asks dashVelocity
+
+readBearing :: Arena Degree
+readBearing = asks dashBearing
 
 readWallHit ::Arena Collision
 readWallHit = asks dashWallHit
