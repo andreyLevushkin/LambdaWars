@@ -2,6 +2,7 @@ module Web (withServerDo, Broadcaster) where
 
 import Snap.Http.Server
 import Snap.Core
+import Snap.Util.FileServe (serveFile)
 import Control.Applicative ((<|>))
 import Control.Concurrent (forkIO, newChan, Chan, writeChan)
 import Data.IORef
@@ -20,7 +21,7 @@ renderWorld broadcastRef = do
 
 site :: IORef (Maybe World) -> Snap ()
 site broadcastRef =
-	ifTop (writeBS "hello world") <|>
+	ifTop (serveFile "static/renderSVG.html") <|>
 	route [
 		("world.svg", renderWorld broadcastRef)
 	]
