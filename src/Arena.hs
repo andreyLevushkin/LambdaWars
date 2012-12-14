@@ -6,45 +6,35 @@ import Control.Monad.Reader
 import Core
 
 -- Looking around your enviroment - takes no time
+
 readRadar :: Arena ScanResult
-readRadar = asks snd
+readRadar = asks dashRadar
 
-readVelocity :: Arena Velocity
-readvelocity = asks (botVelocity . fst)
+readVelocity :: Arena Double
+readVelocity = asks dashVelocity
 
-readRadarPosition :: Arena Degree
-readRadarPosition = asks (botRadar . fst)
-
-readTturretPosition :: Arena Degree
-readTturretPosition = asks (botTurret .fst)
-
-readWallHit ::Arena Bool
-readWallHit = undefined
+readWallHit ::Arena Collision
+readWallHit = asks dashWallHit
 
 -- Commands that take one tick
-cmdTurnRight :: Arena ()
-cmdTurnRight = undefined
+               
+cmdTurn :: Degree -> Bot
+cmdTurn = yield . Turn
 
-cmdTurnLeft :: Arena ()
-cmdTurnLeft = undefined
+cmdAccelerate :: Double -> Bot
+cmdAccelerate = yield . Accelerate
 
-cmdAccelerate :: Arena ()
-cmdAccelerate = undefined
+cmdDecelerate :: Double -> Bot
+cmdDecelerate = yield . Decelerate
 
-cmdDecelerate :: Arena ()
-cmdDecelerate = undefined
+cmdTurnRadar :: Degree -> Bot
+cmdTurnRadar = yield . MoveRadar
 
-cmdTurnRadarLeft :: Arena ()
-cmdTurnRadarLeft = undefined
+cmdTurnTurret :: Degree -> Bot
+cmdTurnTurret = yield . MoveTurret
 
-cmdTurnRadarRight :: Arena ()
-cmdTurnRadarRight = undefined
+cmdFire :: Bot
+cmdFire = yield $ Fire
 
-cmdTurnTurretLeft :: Arena ()
-cmdTurnTurretLeft = undefined
-
-cmdTurnTurretRight :: Arena ()
-cmdTurnTurretRight = undefined
-
-cmdFire :: Arena ()
-cmdFire = undefined
+cmdNothing :: Bot
+cmdNothing = yield $ Empty
