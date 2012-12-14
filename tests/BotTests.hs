@@ -9,21 +9,20 @@ import Arena
 ----------------------------------------------------------------------
 -- Example bots
 
-
 bot1 :: Bot
 bot1 = do
-  vel <- readVelocity
+  cmdTurn 90
+  deg <- readBearing
+  cmdTurn $ deg + 90
   cmdAccelerate 0.5
+
+bot2 :: Bot
+bot2 = do
   cmdFire
-  cmdDecelerate 0.5
+  bot2
 
-dummyDash = DashBoard NothingFound 1.0 NoCollision
+test = take 5 $ 
+       map (map botLastCmd . states) $ -- ^ strip out the command log
+       iterate stepWorld $
+       initWorld [bot1, bot2]
 
--- A single step
-test1 = stepCmd . step dummyDash $ start bot1
-
--- All three steps
--- TODO for now, we are feeding dummy dashboards into each process
-test2 = take 3 $ map stepCmd $ iterate (step dummyDash . stepProc) s
-  where
-    s = step dummyDash (start bot1)
