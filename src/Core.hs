@@ -63,10 +63,6 @@ data ScanResult = BotFound  Double
 
 data World  = World [(BotProcess,BotState)] [Bullet]
 
--- TODO: actual useful Show instance, just for testing webserver currently
-instance Show World where
-  show = const "World"
-
 data Command  = Empty
               | Accelerate Double
               | Decelerate Double

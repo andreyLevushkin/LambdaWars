@@ -12,12 +12,21 @@ import System.Directory (createDirectoryIfMissing)
 
 import Core (World)
 
+instance Show World where
+    show = const $ "<svg xmlns='http://www.w3.org/2000/svg' version='1.1'>"
+              ++ "<circle cx='100' cy='50' r='40' stroke='black'"
+              ++ "stroke-width='2' fill='red'/>"
+              ++ "</svg>"
+
 type Broadcaster = World -> IO ()
 
 renderWorld :: IORef (Maybe World) -> Snap ()
 renderWorld broadcastRef = do
-	maybeWorld <- liftIO $ readIORef broadcastRef
-	writeBS (B.pack (show maybeWorld))
+    maybeWorld <- liftIO $ readIORef broadcastRef
+    case maybeWorld of
+        Just world -> writeBS (B.pack (show world))
+        Nothing    -> return ()
+	
 
 site :: IORef (Maybe World) -> Snap ()
 site broadcastRef =
