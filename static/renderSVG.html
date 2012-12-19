@@ -6,7 +6,7 @@
 $(function() {
     function render() {
         $.get("/world.svg", function(svg) {
-            $("body").html(svg);
+            $("body").html(svg.documentElement);
         });
     }
 

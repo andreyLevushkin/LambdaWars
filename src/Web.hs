@@ -9,14 +9,10 @@ import Data.IORef
 import Control.Monad.Trans (liftIO)
 import Data.ByteString.Char8 as B
 import System.Directory (createDirectoryIfMissing)
+import Text.Blaze.Svg.Renderer.String (renderSvg)
 
 import Core (World)
-
-instance Show World where
-    show = const $ "<svg xmlns='http://www.w3.org/2000/svg' version='1.1'>"
-              ++ "<circle cx='100' cy='50' r='40' stroke='black'"
-              ++ "stroke-width='2' fill='red'/>"
-              ++ "</svg>"
+import UI (renderWorldToSvg)
 
 type Broadcaster = World -> IO ()
 
@@ -24,7 +20,7 @@ renderWorld :: IORef (Maybe World) -> Snap ()
 renderWorld broadcastRef = do
     maybeWorld <- liftIO $ readIORef broadcastRef
     case maybeWorld of
-        Just world -> writeBS (B.pack (show world))
+        Just world -> writeBS (B.pack (renderSvg $ renderWorldToSvg world))
         Nothing    -> return ()
 	
 
