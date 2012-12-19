@@ -7,6 +7,12 @@ The mailing list for this project is the [Lambda Wars Google Group](https://grou
 
 Check out the [project overview](https://github.com/andreyLevushkin/LambdaWars/wiki/Project-Overview) wiki page for the aims.
 
+## How to run
+    cabal install
+    LambdaWars
+
+... then visit [http://localhost:8000/](http://localhost:8000/).
+
 ## How to run tests
     cabal configure --enable-tests
     cabal build
