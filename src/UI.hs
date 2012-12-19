@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module UI where
 
-import Core (BotState, Bullet, bulletPosition)
+import Core (BotState, Bullet, bulletPosition, World(..))
 import Data.String (fromString)
 
 import Text.Blaze.Svg (Svg)
@@ -32,3 +32,7 @@ server = undefined
 
 javascript :: String
 javascript = undefined
+
+renderWorldToSvg :: World -> Svg
+renderWorldToSvg (World _ bullets _) = docTypeSvg $ do
+    renderBullet $ head bullets
