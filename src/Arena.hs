@@ -8,37 +8,37 @@ import Core
 
 -- Looking around your enviroment - takes no time
 
-readRadar :: Arena ScanResult
+readRadar :: Bot ScanResult
 readRadar = asks dashRadar
 
-readVelocity :: Arena Double
+readVelocity :: Bot Double
 readVelocity = asks dashVelocity
 
-readBearing :: Arena Degree
+readBearing :: Bot Degree
 readBearing = asks dashBearing
 
-readWallHit ::Arena Collision
+readWallHit ::Bot Collision
 readWallHit = asks dashWallHit
 
 -- Commands that take one tick
                
-cmdTurn :: Degree -> Bot
+cmdTurn :: Degree -> Bot ()
 cmdTurn = yield . Turn
 
-cmdAccelerate :: Double -> Bot
+cmdAccelerate :: Double -> Bot ()
 cmdAccelerate = yield . Accelerate
 
-cmdDecelerate :: Double -> Bot
+cmdDecelerate :: Double -> Bot ()
 cmdDecelerate = yield . Decelerate
 
-cmdTurnRadar :: Degree -> Bot
+cmdTurnRadar :: Degree -> Bot ()
 cmdTurnRadar = yield . MoveRadar
 
-cmdTurnTurret :: Degree -> Bot
+cmdTurnTurret :: Degree -> Bot ()
 cmdTurnTurret = yield . MoveTurret
 
-cmdFire :: Bot
-cmdFire = yield $ Fire
+cmdFire :: Bot ()
+cmdFire = yield Fire
 
-cmdNothing :: Bot
-cmdNothing = yield $ Empty
+cmdNothing :: Bot ()
+cmdNothing = yield NoAction

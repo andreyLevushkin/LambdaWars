@@ -10,14 +10,14 @@ import Arena
 ----------------------------------------------------------------------
 -- Example bots
 
-bot1 :: Bot
+bot1 :: Bot ()
 bot1 = do
   cmdTurn 90
   deg <- readBearing
   cmdTurn $ deg + 90
   cmdAccelerate 0.5
 
-bot2 :: Bot
+bot2 :: Bot ()
 bot2 = do
   cmdFire
   bot2

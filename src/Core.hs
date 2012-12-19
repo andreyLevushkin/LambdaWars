@@ -4,31 +4,25 @@ module Core where
 import Control.Monad.Reader
 import Control.Monad.Cont
 
--- | Bot process steps yield a single command and the entire rest of the computation
-data Step m = Step { stepCmd :: Command, stepNextProc :: Process m }
+-- | A Bot is a program for a bot. It is written in an imperative style
+--   and is transformed into an Automoton for stepped execution.
+type Bot = ContT Step (Reader DashBoard)
 
--- | this is the infinite stream of steps from the Bot
-newtype Process m = Process { runProcess :: m (Step m) }
+-- | Given a DashBoard, an Automaton emits a command and a new Automaton.
+type Automaton = Reader DashBoard Step
+data Step = Step { stepCmd :: Command, stepNext :: Automaton}
 
--- | start the process. transforms a Bot into a Process stream
-start :: Monad m => ContT (Step m) m a -> Process m
-start bot = Process $ runContT bot $ const . fix $ \c -> return $ Step Empty $ Process c
+-- | Start a Bot, transforming it into an Automaton
+start :: Bot a -> Automaton
+start bot = runContT bot $ const . fix $ return . Step NoAction
 
-yield :: Monad m => Command -> ContT (Step m) m ()
-yield cmd = ContT $ \c -> return $ Step cmd (Process $ c ())
+-- | Yield a command for this step
+yield :: Command -> Bot ()
+yield cmd = ContT $ \c -> return $ Step cmd (c ())
 
-----------------------------------------------------------------------
-
-type View = Reader DashBoard
-type Arena a = ContT (Step View) View a -- keep Andrey's name for this
-type Bot = ContT (Step View) View ()
-type BotProcess = Process View
-type BotStep = Step View
-
--- | runs the process for one step, requires the dashboard for this process
-runProc :: DashBoard -> BotProcess -> BotStep
-runProc dash proc = runReader (runProcess proc) dash
-
+-- | Run an Automaton to the next command, using the supplied dashboard
+step :: DashBoard -> Automaton -> Step
+step dash a = runReader a dash
 
 -- | this is the dashboard of readings, ie. the bots view
 -- the bot is provided a new set of readings every step
@@ -65,13 +59,13 @@ data ScanResult = BotFound Double
                 | NothingFound
 
 type BoundingBox = (Point, Point)
-data World  = World [(BotProcess, BotState)] [Bullet] BoundingBox
+data World  = World [(Automaton, BotState)] [Bullet] BoundingBox
 
 -- TODO: actual useful Show instance, just for testing webserver currently
 instance Show World where
   show = const "World"
 
-data Command  = Empty
+data Command  = NoAction
               | Turn Degree
               | Accelerate Double
               | Decelerate Double
@@ -88,7 +82,7 @@ stepBotState :: Command -> BotState -> BotState
 stepBotState cmd s = s' { botLastCmd = cmd }
   where
     s' = case cmd of
-      Empty  -> s
+      NoAction  -> s
       Turn d -> s { botBearing = botBearing s + d }
       _  -> s -- TODO add remaining command cases
       -- need arithmetic on points
@@ -96,27 +90,27 @@ stepBotState cmd s = s' { botLastCmd = cmd }
   
 -- | use the bot state to create the dashboard readings
 -- TODO radar and collision not yet implemented
-newDash :: BotState -> DashBoard
-newDash s = DashBoard NothingFound (sqmag $ botVelocity s) 0 NoCollision
+newDashBoard :: BotState -> DashBoard
+newDashBoard s = DashBoard NothingFound (sqmag $ botVelocity s) 0 NoCollision
   where
     sqmag (x, y) = sqrt $ x*x + y*y
 
 -- | runs the world for one step
 -- TODO we do not handle bullets or collisions for now
 stepWorld :: World -> World
-stepWorld (World (unzip -> (botProcs, botStates)) bullets box)
-  = World (zip botProcs' botStates') bullets box 
+stepWorld (World (unzip -> (botAutos, botStates)) bullets box)
+  = World (zip botAutos' botStates') bullets box 
   where
-    dashes = map newDash botStates
-    botSteps = zipWith runProc dashes botProcs
+    dashes = map newDashBoard botStates
+    botSteps = zipWith step dashes botAutos
     cmds = map stepCmd botSteps
-    botProcs' = map stepNextProc botSteps
+    botAutos' = map stepNext botSteps
     botStates' = zipWith stepBotState cmds botStates
 
 -- | start the bots and create a new world
 -- TODO bounding box
-initWorld :: [Bot] -> World
-initWorld bots = World (zip botProcs botStates) [] undefined
+initWorld :: [Bot ()] -> World
+initWorld bots = World (zip botAutos botStates) [] undefined
   where
-    botProcs = map start bots
-    botStates = iterate id $ BotState (0,0) (0,0) 0 0 0 Empty
+    botAutos = map start bots
+    botStates = iterate id $ BotState (0,0) (0,0) 0 0 0 NoAction
