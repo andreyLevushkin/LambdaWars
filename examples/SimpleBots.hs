@@ -3,7 +3,7 @@ module SimpleBots where
 import Core
 import Control.Monad
 import Arena
-
+import Engine
 
 rammingBot :: Bot
 rammingBot = forever (cmdAccelerate 1)

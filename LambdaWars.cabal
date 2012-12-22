@@ -17,7 +17,7 @@ cabal-version:       >=1.8
 
 executable LambdaWars
   main-is: Main.hs
-  hs-source-dirs: src
+  hs-source-dirs: src, examples
   extensions: OverloadedStrings
             , TypeSynonymInstances
             , FlexibleInstances
@@ -31,7 +31,13 @@ executable LambdaWars
                , snap-server ==0.9.2.4
                , bytestring ==0.9.2.1
                , directory
-
+               , random
+               , MonadRandom
+               , monad-loops
+               , AC-Vector
+               , AC-Vector-Fancy
+               , AC-Angle
+               , fclabels
 
 test-suite tests
   type:             exitcode-stdio-1.0
@@ -50,3 +56,10 @@ test-suite tests
                   , snap-server ==0.9.2.4
                   , bytestring ==0.9.2.1
                   , directory
+                  , random
+                  , MonadRandom 
+                  , monad-loops
+                  , AC-Vector
+                  , AC-Vector-Fancy
+                  , AC-Angle
+                  , fclabels 

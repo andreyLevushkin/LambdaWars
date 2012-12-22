@@ -1,6 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 module UI where
 
+import Data.Label
+import Data.Vector.V2
+
 import Core (BotState, Bullet, bulletPosition, World(..))
 import Data.String (fromString)
 
@@ -19,12 +22,12 @@ renderBot = undefined
 
 renderBullet :: Bullet -> Svg
 renderBullet bullet =
-    let (x,y) = bulletPosition bullet
+    let vec = get bulletPosition bullet
     in
         circle
            ! class_ "bullet"
-           ! cx (toValue x)
-           ! cy (toValue y)
+           ! cx (toValue.v2x $ vec)
+           ! cy (toValue.v2y $ vec)
            ! r "5"
 
 server :: IO ()

@@ -3,6 +3,9 @@
 
 module WorldRules where
 
+import Data.BoundingBox.B2
+
+
 -- Turn rate in degrees per tick
 turnRate       = 1
 
@@ -28,12 +31,11 @@ arenaWidth     = 1000
 arenaHeight    = 1000
 
 -- How fast the bullets travel
-bulletVelocity = 40 
+bulletSpeed = 40 
 
 -- Bot dimensions
 botWidth       = 10
 botHeight      = 10
 
-
-
+arenaBBox = BBox2 0 0 arenaHeight arenaWidth
 

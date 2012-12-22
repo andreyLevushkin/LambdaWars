@@ -11,7 +11,7 @@ import Core
 readRadar :: Bot ScanResult
 readRadar = asks dashRadar
 
-readVelocity :: Bot Double
+readVelocity :: Arena Velocity
 readVelocity = asks dashVelocity
 
 readBearing :: Bot Degree
