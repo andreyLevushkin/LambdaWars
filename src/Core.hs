@@ -89,43 +89,6 @@ data Command  = NoAction
 states :: World -> [BotState]
 states (World (unzip -> (_, states')) _ _) = states'
 
--- stepBotState :: Command -> BotState -> BotState
--- stepBotState cmd s = s' { botLastCmd = cmd }
---   where
---     s' = case cmd of
---       NoAction  -> s
---       Turn d -> s { botBearing = botBearing s + d }
---       _  -> s -- TODO add remaining command cases
---       -- need arithmetic on points
---       -- use e.g. velocity verlet
-  
 mkLabels [ ''BotState, ''Bullet, ''World ]                       
 
 
--- | use the bot state to create the dashboard readings
--- TODO radar and collision not yet implemented
--- newDashBoard :: BotState -> DashBoard
--- newDashBoard s = DashBoard NothingFound NoCollision (get botVelocity s)
-
-
--- -- | runs the world for one step
--- -- TODO we do not handle bullets or collisions for now
--- stepWorld :: World -> World
--- stepWorld (World (unzip -> (botAutos, botStates)) bullets box)
---   = World (zip botAutos' botStates') bullets box 
---   where
---     dashes = map newDashBoard botStates
---     botSteps = zipWith step dashes botAutos
---     cmds = map stepCmd botSteps
---     botAutos' = map stepNext botSteps
---     botStates' = zipWith applyCommand cmds botStates
-
--- -- | start the bots and create a new world
--- -- TODO bounding box
--- initWorld :: [Bot ()] -> World
--- initWorld bots = World (zip botAutos botStates) [] undefined
---   where
---     botAutos = map start bots
---     botStates = iterate id $ BotState (Vector2 0 0) (Vector2 0 0) 0 0 0 NoAction
-                       
-                       
