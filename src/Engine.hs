@@ -78,6 +78,7 @@ stepBotState cmd = apply cmd . moveBot
     
     moveBot state = modify botPosition (+ get botVelocity state) state
 
+-- | Gather up all the Fire commands issued by bots and create bullets for them.
 bulletsFired :: [(Step, BotState)] -> [Bullet]
 bulletsFired bots = map (fire . snd) $ filter hasFired bots
   where hasFired (step, _) = stepCmd step == Fire
