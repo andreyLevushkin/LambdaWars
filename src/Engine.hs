@@ -24,10 +24,7 @@ import Data.Label.Pure
 import WorldRules
 import TupleUtils
 
--- TODO randomR
 -- | Random instances used for generating bot starting positions
-
-
 instance Random Point where
   random               = runRand $ Vector2 <$> getRandom <*> getRandom
   randomR (from, to)   = runRand $ Vector2 <$> (getRandomR ((v2x from), (v2x to)))
@@ -63,33 +60,39 @@ instance Random [BotState] where
       f g = Just ((next, gNext), gNext)
         where (next, gNext) = random g
               
--- | Ensure that the bot can't turn by more then permitted by the rules.
+              
+-- | TODO Ensure that the bot can't turn by more then permitted by the rules etc.
 sanitizeCommand :: Command -> Command
 sanitizeCommand = id
 
 -- | Create a new BotState given a command issued by the bot
 stepBotState :: Command -> BotState -> BotState
-stepBotState NoAction = id
-stepBotState (Accelerate delta)   = modify botVelocity $ vmap (+delta) 
-stepBotState (Decelerate delta)   = modify botVelocity $ vmap (+ (-delta))
-stepBotState (Turn       degrees) = modify botVelocity $ rotate degrees   
-stepBotState (MoveTurret degrees) = modify botTurret   $ rotate degrees     
-stepBotState (MoveRadar  degrees) = modify botRadar    $ rotate degrees 
+stepBotState cmd = apply cmd . moveBot
+  where
+    apply NoAction = id
+    apply (Accelerate delta)   = modify botVelocity $ vmap (+delta)
+    apply (Decelerate delta)   = modify botVelocity $ vmap (+ (-delta))
+    apply (Turn       degrees) = modify botVelocity $ rotate degrees   
+    apply (MoveTurret degrees) = modify botTurret   $ rotate degrees     
+    apply (MoveRadar  degrees) = modify botRadar    $ rotate degrees 
+    
+    moveBot state = modify botPosition (+ get botVelocity state) state
 
 bulletsFired :: [(Step, BotState)] -> [Bullet]
 bulletsFired bots = map (fire . snd) $ filter hasFired bots
   where hasFired (step, _) = stepCmd step == Fire
 
+-- | Returns a bullet traveling the direction the bot turret is pointing
 fire :: BotState -> Bullet
 fire state = Bullet position velocity 
   where position = get botPosition state
         velocity = vnormalise (get botTurret state) |* (fromInteger bulletSpeed)
 
--- TODO
+-- | TODO Return true if the bots are colliding 
 botBotCollision :: BotState -> BotState -> Bool
 botBotCollision bot1 bot2 = False
 
--- TODO
+-- | TODO Returns true if this bot is colliding with a wall
 botWallCollision :: BotState -> Bool
 botWallCollision state = False
 
@@ -97,28 +100,29 @@ botWallCollision state = False
 newDashBoard :: [BotState] -> BotState -> DashBoard
 newDashBoard otherBots bot = DashBoard NothingFound NoCollision (get botVelocity bot) 
 
--- TODO Hit test bots - for now just kill off one bot per tick
-pruneDeadBots :: World -> World
-pruneDeadBots =  modify worldBots tail 
-
+-- | TODO this function steps the world - 
+--   for now it does not hit test bullets or test for collisions
 stepWorld :: World -> World
 stepWorld (World bots bullets bbox) = World (zip newSteps newStates) newBullets bbox
   where         
     steps      = map mkSteps bots
     newBullets = map stepBullet $ bullets ++ bulletsFired steps
-    commands   = map (stepCmd . fst) steps
+    commands   = map (sanitizeCommand . stepCmd . fst) steps
     newStates  = map (uncurry stepBotState ) $ zip commands $ map snd bots
     newSteps   = map (stepNext . fst) steps
     mkSteps bot@(automaton, state) = (step dashboard automaton, state)
       where dashboard = newDashBoard otherBots state
             otherBots = filter (== state) . map snd $ bots
             
+-- | Step bullet
 stepBullet :: Bullet -> Bullet                  
 stepBullet bullet = modify bulletPosition (+ get bulletVelocity bullet) bullet
 
+-- | Returns true if the match is over
 matchIsOver :: World -> Bool  
 matchIsOver (World bots _  _) = length bots < 2
   
+-- | Generate a new random world with the supplied bots                                
 newWorld :: RandomGen g => g -> [Bot a] -> World
 newWorld gen bots = World (zip automata states) [] arenaBBox
   where states   = take (length bots) . fst $ random gen
