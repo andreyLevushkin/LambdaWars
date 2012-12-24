@@ -26,24 +26,35 @@ import TupleUtils
 
 -- TODO randomR
 -- | Random instances used for generating bot starting positions
+
+
 instance Random Point where
-  random g = runRand build g
-    where build = Vector2 <$> getRandom <*> getRandom
+  random               = runRand $ Vector2 <$> getRandom <*> getRandom
+  randomR (from, to)   = runRand $ Vector2 <$> (getRandomR ((v2x from), (v2x to)))
+                                           <*> (getRandomR ((v2y from), (v2y to)))
 
 instance Random (Double, Double) where
-  random g = runRand build g
-    where build = do
-            v1 <- getRandom
-            v2 <- getRandom
-            return (v1,v2)
-            
+  random = runRand $ do v1 <- getRandom
+                        v2 <- getRandom
+                        return (v1,v2)
+  
+  randomR (from, to) = runRand $ do v1 <- getRandomR (fst from, fst to)
+                                    v2 <- getRandomR (snd from, snd to)
+                                    return (v1,v2)
+  
 instance Random BotState where
-  random g = runRand build g
-    where build = do
-            position <- getRandom
-            let zero = Vector2 0 0
-            return $ BotState position zero zero zero NoAction
-
+  random = runRand $ do 
+    position <- getRandomR (Vector2 0 0, Vector2 arenaWidth arenaHeight)
+    let zero = Vector2 0 0
+      in return $ BotState position zero zero zero NoAction
+                          
+  randomR (from, to)   = runRand $ let zero  = Vector2 0 0
+                                       fromP = get botPosition from :: Point
+                                       toP   = get botPosition to
+                                   in do 
+                                     position <- getRandomR (fromP, toP)
+                                     return $ BotState position zero zero zero NoAction
+                                   
 -- |Generates non overlapping bot states, we don't want to start with collisions
 instance Random [BotState] where
   random g =  (nubBy botBotCollision states, head gs)
@@ -112,7 +123,8 @@ newWorld :: RandomGen g => g -> [Bot a] -> World
 newWorld gen bots = World (zip automata states) [] arenaBBox
   where states   = take (length bots) . fst $ random gen
         automata = map start bots                       
-        
+        zero     = Vector2 0 0
+
   
   
   
