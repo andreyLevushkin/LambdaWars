@@ -6,7 +6,6 @@ import Control.Monad.Random.Class
 import Control.Monad.Loops
 import Data.List
 import Data.Label.Pure
-
 import Debug.Trace
 
 -- Vectors
@@ -23,8 +22,10 @@ import Core
 import GeometryUtils
 import Data.Label.Pure
 import WorldRules
+import TupleUtils
 
 -- TODO randomR
+-- | Random instances used for generating bot starting positions
 instance Random Point where
   random g = runRand build g
     where build = Vector2 <$> getRandom <*> getRandom
@@ -43,18 +44,26 @@ instance Random BotState where
             let zero = Vector2 0 0
             return $ BotState position zero zero zero NoAction
 
+-- |Generates non overlapping bot states, we don't want to start with collisions
+instance Random [BotState] where
+  random g =  (nubBy botBotCollision states, head gs)
+    where 
+      (states, gs) = unzip $ unfoldr f g 
+      f g = Just ((next, gNext), gNext)
+        where (next, gNext) = random g
+              
 -- | Ensure that the bot can't turn by more then permitted by the rules.
 sanitizeCommand :: Command -> Command
 sanitizeCommand = id
 
 -- | Create a new BotState given a command issued by the bot
 stepBotState :: Command -> BotState -> BotState
-stepBotState NoAction state = state
-stepBotState (Accelerate delta)   state = modify botVelocity (vmap (+delta) )    state 
-stepBotState (Decelerate delta)   state = modify botVelocity (vmap (+ (-delta))) state 
-stepBotState (Turn       degrees) state = modify botVelocity (rotate degrees)    state 
-stepBotState (MoveTurret degrees) state = modify botTurret   (rotate degrees)    state 
-stepBotState (MoveRadar  degrees) state = modify botRadar    (rotate degrees)    state 
+stepBotState NoAction = id
+stepBotState (Accelerate delta)   = modify botVelocity $ vmap (+delta) 
+stepBotState (Decelerate delta)   = modify botVelocity $ vmap (+ (-delta))
+stepBotState (Turn       degrees) = modify botVelocity $ rotate degrees   
+stepBotState (MoveTurret degrees) = modify botTurret   $ rotate degrees     
+stepBotState (MoveRadar  degrees) = modify botRadar    $ rotate degrees 
 
 bulletsFired :: [(Step, BotState)] -> [Bullet]
 bulletsFired bots = map (fire . snd) $ filter hasFired bots
@@ -73,16 +82,6 @@ botBotCollision bot1 bot2 = False
 botWallCollision :: BotState -> Bool
 botWallCollision state = False
 
--- Generates non overlapping bots states
-instance Random [BotState] where
-  random g =  (nubBy botBotCollision states, head gs)
-    where 
-      (states, gs) = unzip $ unfoldr f g 
-      f g = Just ((next, gNext), gNext)
-        where (next, gNext) = random g
-        
-                          
-
 -- TODO scan results and collision results
 newDashBoard :: [BotState] -> BotState -> DashBoard
 newDashBoard otherBots bot = DashBoard NothingFound NoCollision (get botVelocity bot) 
@@ -92,27 +91,28 @@ pruneDeadBots :: World -> World
 pruneDeadBots =  modify worldBots tail 
 
 stepWorld :: World -> World
-stepWorld (World bots bullets bbox) = World (zip (map (stepNext . fst) steps) newStates) newBullets bbox
-  where f (process, state) = (step (newDashBoard (map snd bots) state) process, trace (show state) state)
-        steps = map f bots
-        newBullets = map stepBullet $ bullets ++ bulletsFired steps
-        commands = map (stepCmd . fst) steps
-        newStates  = map (uncurry stepBotState ) $ zip commands $ map snd bots
-
+stepWorld (World bots bullets bbox) = World (zip newSteps newStates) newBullets bbox
+  where         
+    steps      = map mkSteps bots
+    newBullets = map stepBullet $ bullets ++ bulletsFired steps
+    commands   = map (stepCmd . fst) steps
+    newStates  = map (uncurry stepBotState ) $ zip commands $ map snd bots
+    newSteps   = map (stepNext . fst) steps
+    mkSteps bot@(automaton, state) = (step dashboard automaton, state)
+      where dashboard = newDashBoard otherBots state
+            otherBots = filter (== state) . map snd $ bots
+            
 stepBullet :: Bullet -> Bullet                  
 stepBullet bullet = modify bulletPosition (+ get bulletVelocity bullet) bullet
 
 matchIsOver :: World -> Bool  
 matchIsOver (World bots _  _) = length bots < 2
   
-runMatch :: [Bot a] -> IO (Maybe (Bot a))
-runMatch bots = do 
-  startStates <- randomIO >>= return . take (length bots) :: IO [BotState]
-  let world   = World (zip botProcesses startStates) [] arenaBBox
-      botProcesses = map start bots
-      result = until matchIsOver ( pruneDeadBots . stepWorld) world
-  print result
-  return Nothing
+newWorld :: RandomGen g => g -> [Bot a] -> World
+newWorld gen bots = World (zip automata states) [] arenaBBox
+  where states   = take (length bots) . fst $ random gen
+        automata = map start bots                       
+        
   
   
   

@@ -5,10 +5,10 @@ import Control.Monad
 import Arena
 import Engine
 
-rammingBot :: Bot
+rammingBot :: Bot a
 rammingBot = forever (cmdAccelerate 1)
 
-searchAndFire :: Bot
+searchAndFire :: Bot a
 searchAndFire = do
   radar <- readRadar
   case radar of 

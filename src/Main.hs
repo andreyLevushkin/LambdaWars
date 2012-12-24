@@ -2,19 +2,27 @@ module Main where
 
 import Core
 import Web
+import Engine
 
+import SimpleBots
+
+import System.Random
 import Control.Concurrent (threadDelay)
 import Data.Vector.V2
 import Data.BoundingBox.B2
 
-serverLoop :: Broadcaster -> IO ()
-serverLoop broadcast = do
+serverLoop :: World -> Broadcaster -> IO ()
+serverLoop world broadcast = do
 	-- XXX: just stubbed out atm, wait 1 second then broadcast an empty world
 	threadDelay 1000000
-        broadcast $ World [] [ Bullet (Vector2 100 50) undefined ] (BBox2 0 0 100 100)
-	serverLoop broadcast
-
+        broadcast world
+        if matchIsOver world
+          then serverLoop world broadcast
+          else serverLoop (stepWorld world) broadcast
+        
 main = do
 	withServerDo $ \broadcast -> do
 		putStrLn "Web server up and running"
-		serverLoop broadcast
+                gen <- getStdGen
+		let bots = [rammingBot, searchAndFire, searchAndFire]
+                  in serverLoop (newWorld gen bots) broadcast

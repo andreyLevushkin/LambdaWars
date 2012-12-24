@@ -11,11 +11,11 @@ import Core
 readRadar :: Bot ScanResult
 readRadar = asks dashRadar
 
-readVelocity :: Arena Velocity
+readVelocity :: Bot Velocity
 readVelocity = asks dashVelocity
 
-readBearing :: Bot Degree
-readBearing = asks dashBearing
+--readBearing :: Bot Degree
+--readBearing = asks dashBearing
 
 readWallHit ::Bot Collision
 readWallHit = asks dashWallHit
