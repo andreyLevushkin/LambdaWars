@@ -3,6 +3,9 @@ module Arena where
 
 import Control.Monad.Reader.Class
 import Control.Monad.Reader
+import Data.Vector.Class
+import Data.Vector.V2
+import Data.Angle
 
 import Core
 
@@ -14,8 +17,10 @@ readRadar = asks dashRadar
 readVelocity :: Bot Velocity
 readVelocity = asks dashVelocity
 
---readBearing :: Bot Degree
---readBearing = asks dashBearing
+readBearing :: Bot Degree
+readBearing = do 
+  heading <- fmap vnormalise readVelocity
+  return . arccosine $ vdot (Vector2 0 1) heading
 
 readWallHit ::Bot Collision
 readWallHit = asks dashWallHit
