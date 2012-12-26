@@ -63,8 +63,16 @@ instance Random [BotState] where
               
 -- | TODO Ensure that the bot can't turn by more then permitted by the rules etc.
 sanitizeCommand :: Command -> Command
-sanitizeCommand = id
+sanitizeCommand (Accelerate value) = Accelerate $ bound 0 maxAcceleration value
+sanitizeCommand (Decelerate value) = Decelerate $ bound 0 maxDeceleration value
+sanitizeCommand (MoveTurret value) = MoveTurret $ bound (-turretTurnRate) turretTurnRate value
+sanitizeCommand (MoveRadar value)  = MoveRadar  $ bound (-radarTurnRate) radarTurnRate value
+sanitizeCommand (Turn value)       = Turn       $ bound (-turnRate) turnRate value
+sanitizeCommand cmd = cmd
 
+bound :: Ord a => a -> a -> a -> a
+bound x y = max x . min y
+  
 -- | Create a new BotState given a command issued by the bot
 stepBotState :: Command -> BotState -> BotState
 stepBotState cmd = apply cmd . moveBot
