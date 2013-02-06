@@ -14,7 +14,7 @@ import Text.Blaze.Svg11.Attributes
 showBoard :: [BotState] -> [Bullet] -> IO ()
 showBoard = undefined
 
-renderSvg :: [BotState] -> [Bullet] -> Svg 
+renderSvg :: [BotState] -> [Bullet] -> Svg
 renderSvg = undefined
 
 renderBot :: BotState -> Svg
@@ -30,12 +30,9 @@ renderBullet bullet =
            ! cy (toValue.v2y $ vec)
            ! r "5"
 
-server :: IO ()
-server = undefined 
-
 javascript :: String
 javascript = undefined
 
 renderWorldToSvg :: World -> Svg
 renderWorldToSvg (World _ bullets _) = docTypeSvg $ do
-    renderBullet $ head bullets
+    mapM_ renderBullet bullets
