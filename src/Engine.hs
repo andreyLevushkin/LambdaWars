@@ -106,7 +106,7 @@ botBotCollision :: BotState -> BotState -> Bool
 botBotCollision bot1 bot2 = (>10) . vLength $ pos bot1 - pos bot2
   where pos = get botPosition
 
--- | TODO Returns true if this bot is colliding with a wall
+-- | Returns true if this bot is colliding with a wall
 botWallCollision :: BotState -> Bool
 botWallCollision state =  (get botPosition state) `within_bounds` shrink 10 arenaBBox 
 
