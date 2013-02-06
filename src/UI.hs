@@ -4,7 +4,7 @@ module UI where
 import Data.Label
 import Data.Vector.V2
 
-import Core (BotState, Bullet, bulletPosition, World(..))
+import Core (BotState, Bullet, botPosition, bulletPosition, World(..))
 import Data.String (fromString)
 
 import Text.Blaze.Svg (Svg)
@@ -18,7 +18,14 @@ renderSvg :: [BotState] -> [Bullet] -> Svg
 renderSvg = undefined
 
 renderBot :: BotState -> Svg
-renderBot = undefined
+renderBot bot =
+    let vec = get botPosition bot
+    in
+        circle
+           ! class_ "bot"
+           ! cx (toValue.v2x $ vec)
+           ! cy (toValue.v2y $ vec)
+           ! r "5"
 
 renderBullet :: Bullet -> Svg
 renderBullet bullet =
@@ -37,5 +44,7 @@ javascript :: String
 javascript = undefined
 
 renderWorldToSvg :: World -> Svg
-renderWorldToSvg (World _ bullets _) = docTypeSvg $ do
-    renderBullet $ head bullets
+renderWorldToSvg (World bots bullets _) =
+  docTypeSvg $ do
+    mapM_ renderBullet bullets
+    mapM_ renderBot (map snd bots)
