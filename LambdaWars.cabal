@@ -24,12 +24,12 @@ executable LambdaWars
             , MultiParamTypeClasses
             , GeneralizedNewtypeDeriving
 
-  build-depends: base ==4.5.*
+  build-depends: base >= 4.5 && < 5
                , blaze-svg
                , mtl
                , snap-core ==0.9.2.2
                , snap-server ==0.9.2.4
-               , bytestring ==0.9.2.1
+               , bytestring >=0.9.2
                , directory
                , random
                , MonadRandom
@@ -62,4 +62,4 @@ test-suite tests
                   , AC-Vector
                   , AC-Vector-Fancy
                   , AC-Angle
-                  , fclabels 
+                  , fclabels
