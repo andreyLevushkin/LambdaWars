@@ -1,15 +1,16 @@
 module Web (withServerDo, Broadcaster) where
 
-import Snap.Http.Server
-import Snap.Core
-import Snap.Util.FileServe (serveFile)
 import Control.Applicative ((<|>))
 import Control.Concurrent (forkIO, newChan, Chan, writeChan)
-import Data.IORef
 import Control.Monad.Trans (liftIO)
 import Data.ByteString.Char8 as B
+import Data.IORef
+import Data.Monoid (mempty)
+import Snap.Core
+import Snap.Http.Server
+import Snap.Util.FileServe (serveFile)
 import System.Directory (createDirectoryIfMissing)
-import Text.Blaze.Svg.Renderer.String (renderSvg)
+import Text.Blaze.Svg.Renderer.Text (renderSvg)
 
 import Core (World)
 import UI (renderWorldToSvg)
@@ -17,12 +18,7 @@ import UI (renderWorldToSvg)
 type Broadcaster = World -> IO ()
 
 renderWorld :: IORef (Maybe World) -> Snap ()
-renderWorld broadcastRef = do
-    maybeWorld <- liftIO $ readIORef broadcastRef
-    case maybeWorld of
-        Just world -> writeBS (B.pack (renderSvg $ renderWorldToSvg world))
-        Nothing    -> return ()
-	
+renderWorld broadcastRef = liftIO (readIORef broadcastRef) >>= writeLazyText . renderSvg . maybe mempty renderWorldToSvg
 
 site :: IORef (Maybe World) -> Snap ()
 site broadcastRef =
@@ -33,7 +29,7 @@ site broadcastRef =
 
 withServerDo :: (Broadcaster -> IO ()) -> IO ()
 withServerDo actionWithBroadcaster = do
-	-- snap logs to stderr and says "THIS IS BAD" 
+	-- snap logs to stderr and says "THIS IS BAD"
 	-- if it can't create log files in ./log
 	let createParents = False in createDirectoryIfMissing createParents "log"
 	broadcastRef <- newIORef Nothing
