@@ -38,9 +38,9 @@ arenaHeight    = 1000
 -- |How fast the bullets travel
 bulletSpeed = 40 
 
--- |Bot dimensions
-botWidth       = 10
-botHeight      = 10
+-- |Bot dimensions - make bots circular for now
+botSize :: Double
+botSize =  10
 
 -- | Bounding box of the arena
 arenaBBox = BBox2 0 0 arenaHeight arenaWidth

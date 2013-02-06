@@ -15,6 +15,7 @@ import Data.Vector.Transform.T2
 import Data.Angle 
 import Data.Vector.Transform.Fancy 
 import Data.Vector.Class
+import Data.BoundingBox.B2
 
 import Control.Applicative
 
@@ -61,7 +62,7 @@ instance Random [BotState] where
         where (next, gNext) = random g
               
               
--- | TODO Ensure that the bot can't turn by more then permitted by the rules etc.
+-- | Ensure that the bot can't turn by more then permitted by the rules etc.
 sanitizeCommand :: Command -> Command
 sanitizeCommand (Accelerate value) = Accelerate $ bound 0 maxAcceleration value
 sanitizeCommand (Decelerate value) = Decelerate $ bound 0 maxDeceleration value
@@ -97,13 +98,17 @@ fire state = Bullet position velocity
   where position = get botPosition state
         velocity = vnormalise (get botTurret state) |* (fromInteger bulletSpeed)
 
+vLength :: Vector2 -> Double
+vLength vector = sqrt $ vdot vector vector
+
 -- | TODO Return true if the bots are colliding 
 botBotCollision :: BotState -> BotState -> Bool
-botBotCollision bot1 bot2 = False
+botBotCollision bot1 bot2 = (>10) . vLength $ pos bot1 - pos bot2
+  where pos = get botPosition
 
 -- | TODO Returns true if this bot is colliding with a wall
 botWallCollision :: BotState -> Bool
-botWallCollision state = False
+botWallCollision state =  (get botPosition state) `within_bounds` shrink 10 arenaBBox 
 
 -- TODO scan results and collision results
 newDashBoard :: [BotState] -> BotState -> DashBoard
