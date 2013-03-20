@@ -15,3 +15,11 @@ searchAndFire = do
     BotFound _ -> cmdFire
     _          -> cmdTurnRadar 1
   searchAndFire
+  
+runInCircle :: Bot a
+runInCircle = do
+  cmdAccelerate 1
+  cmdTurn 5
+  runInCircle
+  
+  
