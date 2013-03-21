@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ghci -v \
+ghci \
     -isrc:examples \
     -XOverloadedStrings -XTypeSynonymInstances -XFlexibleInstances \
     -XMultiParamTypeClasses -XGeneralizedNewtypeDeriving \
