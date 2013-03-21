@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ghci -v \
+    -isrc:examples \
+    -XOverloadedStrings -XTypeSynonymInstances -XFlexibleInstances \
+    -XMultiParamTypeClasses -XGeneralizedNewtypeDeriving \
+    "$@"
