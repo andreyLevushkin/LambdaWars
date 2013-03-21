@@ -29,7 +29,7 @@ maxAcceleration = 1
 maxDeceleration :: Double
 maxDeceleration = 2
 
--- |Withd of the arena
+-- |Width of the arena
 arenaWidth     = 50
 
 -- |Height of the arena
