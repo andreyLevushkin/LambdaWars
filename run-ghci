@@ -4,4 +4,5 @@ ghci -v \
     -isrc:examples \
     -XOverloadedStrings -XTypeSynonymInstances -XFlexibleInstances \
     -XMultiParamTypeClasses -XGeneralizedNewtypeDeriving \
+    -package bytestring-0.9.2.1 \
     "$@"
