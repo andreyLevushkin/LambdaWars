@@ -8,15 +8,15 @@ import Data.Angle
 
 -- |Turn rate in degrees per tick
 turnRate :: Degrees Double
-turnRate = 1
+turnRate = 5
 
 -- |Radar turn rate in degrees per tick
 radarTurnRate :: Degrees Double
-radarTurnRate  = 10
+radarTurnRate  = 15
 
 -- |Turret turn rate in degrees per tick
 turretTurnRate :: Degrees Double
-turretTurnRate = 5
+turretTurnRate = 10
 
 -- |Max speed in pixles per tick
 maxSpeed       = 8
@@ -29,11 +29,11 @@ maxAcceleration = 1
 maxDeceleration :: Double
 maxDeceleration = 2
 
--- |Withd of the arena
-arenaWidth     = 1000
+-- |Width of the arena
+arenaWidth     = 50
 
 -- |Height of the arena
-arenaHeight    = 1000
+arenaHeight    = 50
 
 -- |How fast the bullets travel
 bulletSpeed = 40 
