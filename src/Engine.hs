@@ -84,7 +84,7 @@ stepBotState cmd = apply cmd . moveBot
     apply (Turn       degrees) = modify botVelocity $ rotate degrees   
     apply (MoveTurret degrees) = modify botTurret   $ rotate degrees     
     apply (MoveRadar  degrees) = modify botRadar    $ rotate degrees 
-    
+    apply _ = id    
     moveBot state = modify botPosition (+ get botVelocity state) state
 
 -- | Gather up all the Fire commands issued by bots and create bullets for them.

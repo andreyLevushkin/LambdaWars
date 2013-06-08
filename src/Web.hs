@@ -1,5 +1,4 @@
-module Web (withServerDo, Broadcaster) where
-
+-- For now I removed snap from the dependency list to reduce the number of build dependencies so this file will not compile
 import Control.Applicative ((<|>))
 import Control.Concurrent (forkIO, newChan, Chan, writeChan)
 import Control.Monad.Trans (liftIO)
