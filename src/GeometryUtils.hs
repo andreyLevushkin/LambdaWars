@@ -21,8 +21,7 @@ angle :: Fractional a => Vector2 -> Vector2 -> a
 angle v1 v2 = realToFrac . acos $ vdot v1 v2 / ((vmag v1) * (vmag v2))
 
 radiansToDegrees :: (Fractional a ,Num a) => a -> a
-radiansToDegrees = (*) (180 / 3.145)
-
+radiansToDegrees = (*) (180 / (realToFrac pi))
 
 xAxisVector = Vector2 1 0 
 
