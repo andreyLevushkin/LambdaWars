@@ -1,4 +1,4 @@
-module GLUI where
+module GLUI (showBattle, showTestWorld) where
 
 import Graphics.Rendering.OpenGL 
 import Graphics.UI.GLUT
@@ -25,6 +25,8 @@ arenaHeightP = realToFrac arenaHeight
 arenaWidthP :: GLfloat
 arenaWidthP = realToFrac arenaWidth
 
+-- | This is the main function in this module. Pass in the initial world
+--   to draw and a world step function to update the world on every turn.
 showBattle :: World -> (World -> World) -> IO ()
 showBattle initial stepper = do
     putStrLn "Press SPACE to step through the battle and 'q' to quit." 
