@@ -20,9 +20,11 @@ main = glMain
 
 glMain = do
   gen <- getStdGen
-  let bots  = [rammingBot, searchAndFire, searchAndFire, runInCircle, fireBot]
+  let bots  = [runInCircle, sittingDuck]
   let world = (newWorld gen bots)
   showBattle world stepWorld
+
+
          
 --snapMain = do
 --	withServerDo $ \broadcast -> do

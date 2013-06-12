@@ -25,4 +25,6 @@ runInCircle = do
 
 fireBot :: Bot a 
 fireBot = forever cmdFire  
-  
+
+sittingDuck :: Bot a
+sittingDuck = forever (cmdTurnTurret 1)  

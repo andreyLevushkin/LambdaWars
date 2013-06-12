@@ -30,10 +30,10 @@ maxDeceleration :: Double
 maxDeceleration = 2
 
 -- |Width of the arena
-arenaWidth     = 200
+arenaWidth     = 800
 
 -- |Height of the arena
-arenaHeight    = 200
+arenaHeight    = 800
 
 -- |How fast the bullets travel
 bulletSpeed = 40 

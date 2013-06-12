@@ -17,8 +17,14 @@ shrink delta box = bound_corners bottomLeft topRight
     bottomLeft = min_point box + (Vector2 delta delta)
     topRight   = max_point box - (Vector2 delta delta)
 
-angle :: Fractional a => Vector2 -> Vector2 -> a
-angle v1 v2 = realToFrac . acos $ vdot v1 v2 / ((vmag v1) * (vmag v2))
+angleRads :: Fractional a => Vector2 -> Vector2 -> a
+angleRads v1 v2 
+    | v1 == (Vector2 0 0) = 0
+    | v2 == (Vector2 0 0) = 0
+    | otherwise           = realToFrac . acos $ vdot v1 v2 / ((vmag v1) * (vmag v2))
+
+angleDegrees :: (Num a, Fractional a) => Vector2 -> Vector2 -> a
+angleDegrees v1 v2 = radiansToDegrees $ angleRads v1 v2
 
 radiansToDegrees :: (Fractional a ,Num a) => a -> a
 radiansToDegrees = (*) (180 / (realToFrac pi))
