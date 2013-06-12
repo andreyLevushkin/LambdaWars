@@ -4,8 +4,6 @@ import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 
 import Data.Vector.V2 hiding (Vector2)
-import Data.BoundingBox.B2 hiding (min_point, max_point)
-import Data.BoundingBox.Range
 
 import qualified Data.Vector.V2 as V
 import Data.IORef ( IORef, newIORef, writeIORef, readIORef, modifyIORef)
