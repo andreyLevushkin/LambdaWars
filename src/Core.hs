@@ -9,6 +9,9 @@ import Data.Angle
 import Data.Label
 import Data.BoundingBox.B2
 
+-- Used for pretty printing
+import Text.PrettyPrint
+import Text.Printf  
 
 -- | A Bot is a program for a bot. It is written in an imperative style
 --   and is transformed into an Automoton for stepped execution.
@@ -67,15 +70,15 @@ data ScanResult = BotFound Double
                 | NothingFound
 
 type BoundingBox = BBox2
+
 data World  = World {
    _worldBots    :: [(Automaton, BotState)], 
    _worldBullets :: [Bullet],
    _worldBox     :: BoundingBox
 }
 
--- TODO: actual useful Show instance, just for testing webserver currently
 instance Show World where
-  show (World bots bullets _) = show $ map snd bots
+  show = render . ppr
 
 data Command  = NoAction
               | Turn Degree
@@ -89,6 +92,61 @@ data Command  = NoAction
 -- TODO nicer way of extracting states
 states :: World -> [BotState]
 states (World (unzip -> (_, states')) _ _) = states'
+
+-------------------------------------------------------------------
+-- Pretty printing for Core types ---------------------------------
+-------------------------------------------------------------------
+
+columnWidth :: Int
+columnWidth = 20
+
+lineWidth :: Int
+lineWidth = columnWidth * 5
+
+column :: String -> Doc
+column = text . pad ' ' columnWidth
+
+heading :: String -> Doc 
+heading = text . pad '=' lineWidth . (++) "==" 
+
+pad :: Char -> Int -> String -> String
+pad c count input = input ++ (take padLength $ repeat c)
+  where padLength = max 0 (count - length input)
+
+class Pretty a where
+  ppr :: a -> Doc
+
+instance Pretty Command where
+  ppr = text . show
+
+instance Pretty Vector2 where
+  ppr (Vector2 x y) = column $ "(x:" ++ (printf "%.2f" x) ++ ", y:" ++ (printf "%.2f" y) ++ ")"
+
+instance Pretty BotState where
+  ppr (BotState position velocity turret radar lastCmd) 
+    = (ppr position) <+> (ppr velocity) <+> (ppr turret) <+> (ppr radar) <+> (ppr lastCmd)
+
+instance Pretty [BotState] where
+  ppr bots = vcat $ (column "Position" <+> 
+                     column "Velocity"  <+> 
+                     column "Turret"    <+> 
+                     column "Radar"     <+> 
+                     column "Last Command") : (map ppr bots)
+
+instance Pretty [Bullet] where
+  ppr bullets =  vcat $ (column "Position" <+> column "Velocity") : (map ppr bullets)
+
+instance Pretty Bullet where
+  ppr (Bullet position velocity) = (ppr position) <+> (ppr velocity)
+
+instance Pretty World where
+  ppr (World bots bullets arena) = vcat $ [
+      heading "Bot arena status:",
+      heading "Bots",
+      ppr $ map snd bots,
+      heading "Bullets",
+      ppr bullets
+    ]
 
 mkLabels [ ''BotState, ''Bullet, ''World ]                       
 

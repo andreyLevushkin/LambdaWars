@@ -38,6 +38,8 @@ executable LambdaWars
                , AC-Vector-Fancy
                , AC-Angle
                , fclabels
+               , pretty
+
 
 test-suite tests
   type:             exitcode-stdio-1.0
