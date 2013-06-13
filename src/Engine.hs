@@ -55,11 +55,14 @@ instance Random BotState where
                                    
 -- |Generates non overlapping bot states, we don't want to start with collisions
 instance Random [BotState] where
-  random g =  (nubBy botBotCollision states, head gs)
+  random g =  (nubBy nubCmp states, head gs)
     where 
+      -- | Return true if bots are not colliding
+      nubCmp s1 s2 = not $ botBotCollision s1 s2  
       (states, gs) = unzip $ unfoldr f g 
-      f g = Just ((next, gNext), gNext)
-        where (next, gNext) = random g
+      f g          = Just ((next, gNext), gNext)
+                       where 
+                        (next, gNext) = random g
               
               
 -- | Ensure that the bot can't turn by more then permitted by the rules etc.
