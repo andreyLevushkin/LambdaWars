@@ -35,6 +35,8 @@ executable LambdaWars
                , fclabels
                , OpenGL
                , GLUT
+               , pretty
+
 
 test-suite tests
   type:             exitcode-stdio-1.0
