@@ -54,8 +54,10 @@ data BotState = BotState {
   _botTurret   :: Direction,
   _botRadar    :: Direction,
   _botLastCmd  :: Command -- ^ useful for logging
-} deriving (Show, Eq)
+} deriving (Eq)
 
+instance Show BotState where
+  show = render . ppr
 
 type Degree = Degrees Double
 
