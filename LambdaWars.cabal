@@ -15,6 +15,9 @@ category:            Game
 build-type:          Simple
 cabal-version:       >=1.8
 
+Data-Files: resources/body.tex
+          , resources/turret.tex
+
 executable LambdaWars
   main-is: Main.hs
   hs-source-dirs: src, examples

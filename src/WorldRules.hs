@@ -40,7 +40,7 @@ bulletSpeed = 40
 
 -- |Bot dimensions - make bots circular for now
 botSize :: Double
-botSize =  10
+botSize =  36
 
 -- | Bounding box of the arena
 arenaBBox = BBox2 0 0 arenaHeight arenaWidth
