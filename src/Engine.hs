@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
+
 module Engine where
 
 import System.Random
@@ -64,6 +66,7 @@ instance Random [BotState] where
                        where 
                         (next, gNext) = random g
               
+  randomR (from, to)   = undefined -- TODO - replace with better definition
               
 -- | Ensure that the bot can't turn by more then permitted by the rules etc.
 sanitizeCommand :: Command -> Command
