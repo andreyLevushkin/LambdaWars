@@ -17,3 +17,14 @@ Check out the [project overview](https://github.com/andreyLevushkin/LambdaWars/w
     cabal configure --enable-tests
     cabal build
     cabal test
+
+## To get up and running in GHCi
+from the LambdaWars directory (just above src) run:
+    
+    ghci -i:src:tests:examples
+    
+and the you can use
+
+    :l modulename
+
+to load any of the modules.
