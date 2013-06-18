@@ -24,6 +24,8 @@ import qualified GeometryUtils as Geom
 
 import SimpleBots
 
+
+
 -- | The type to contain all the OpenGL drawing state
 data GLUI = GLUI {
     hullTexture   :: TextureObject,
@@ -114,16 +116,12 @@ drawHull glui = do
     textureBinding Texture2D $= Just (hullTexture glui)
     texturedQuad (realToFrac botSize) (realToFrac botSize)
     textureBinding Texture2D $= Nothing
-    where
-        width  = realToFrac $ botSize / 2 :: GLfloat
-        height = realToFrac $ botSize / 2 :: GLfloat
 
 -- | Draw a bot's turret. The direction is relative to the bot hull.
 drawTurret :: GLUI -> Direction -> IO ()
 drawTurret glui direction = preservingMatrix $ do
     rotateZ   $ angleDegrees direction xAxisVector
-    texture        Texture2D $= Enabled
-    blend $= Enabled
+    texture Texture2D $= Enabled
     textureBinding Texture2D $= Just (turretTexture glui)
     texturedQuad 54 20
     textureBinding Texture2D  $=  Nothing
