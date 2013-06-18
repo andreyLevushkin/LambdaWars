@@ -1,3 +1,5 @@
+module TextUI where
+
 import SimpleBots
 import Engine
 import Core
