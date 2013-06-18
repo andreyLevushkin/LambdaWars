@@ -6,8 +6,8 @@ import Core
 import System.Random
 import Text.PrettyPrint
 
-textUI :: IO()
-textUI = do
+gameUI :: IO()
+gameUI = do
     firstWorld <- createWorld
     gameLoop firstWorld
 
