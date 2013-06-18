@@ -13,6 +13,14 @@ Check out the [project overview](https://github.com/andreyLevushkin/LambdaWars/w
 
 ... then visit [http://localhost:8000/](http://localhost:8000/).
 
+if cabal complains about missing dependencies for example:
+    cabal: At least the following dependencies are missing:
+    snap-core ==0.9.2.2, snap-server ==0.9.2.4
+
+Run cabal install ${list of missing dependencies}, in the above example that would be 
+
+    cabal install snap-core-0.9.2.2 snap-server-0.9.2.4
+
 ## How to run tests
     cabal configure --enable-tests
     cabal build
