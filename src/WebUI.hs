@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 
 module WebUI where
 
@@ -21,10 +20,10 @@ import Engine
 import Core
 import System.Random
 
-todo = undefined
+-- TODO = Add code to allow quiting the game in GHCi without closing GHCi
 
-webUI :: IO ()
-webUI = do
+gameUI :: IO ()
+gameUI = do
     firstWorld <-createWorld
     worldRef <- newIORef firstWorld
     serverWith webConfig (lambdaWarsHandler worldRef)
