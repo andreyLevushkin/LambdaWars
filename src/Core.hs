@@ -1,5 +1,5 @@
 
-{-# LANGUAGE ViewPatterns, TemplateHaskell #-}
+{-# LANGUAGE FlexibleInstances, ViewPatterns, TemplateHaskell #-}
 module Core  where
 
 import Control.Monad.Reader

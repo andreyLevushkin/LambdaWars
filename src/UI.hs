@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module UI where
 
 import Data.Label
@@ -12,9 +14,6 @@ import Text.Blaze.Svg11.Attributes
 
 showBoard :: [BotState] -> [Bullet] -> IO ()
 showBoard = undefined
-
-renderSvg :: [BotState] -> [Bullet] -> Svg
-renderSvg = undefined
 
 renderBot :: BotState -> Svg
 renderBot bot =
