@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 
 module WebUI where
 
@@ -21,28 +20,39 @@ import Engine
 import Core
 import System.Random
 
-todo = undefined
+-- TODO = Add code to allow quiting the game in GHCi without closing GHCi
 
-webUI :: IO ()
-webUI = do
-    firstWorld <- createWorld
-    worldRef <- todo
-    serverWith webConfig (webHandler worldRef)
+gameUI :: IO ()
+gameUI = do
+    firstWorld <-createWorld
+    worldRef <- newIORef firstWorld
+    serverWith webConfig (lambdaWarsHandler worldRef)
 
 webConfig :: HTTP.Config
 webConfig = defaultConfig { srvLog = stdLogger }
 
 
--- type Handler a = SockAddr -> Network.URL.URL -> Request a -> IO (Response a)
-webHandler :: (IORef World) -> HTTP.Handler String
-webHandler worldRef = \statusCode url request ->
+-- lambdaWarsHandler takes a IORef to the world and returns the HHTP Handler.
+-- If it is GET for the SVG return the SVG.
+-- If it is another GET, then return the home page
+-- Otherwise reutrn 404 error
+
+-- type Handler a = SockAddr -> URL -> Request a -> IO (Response a)
+-- Everytime there is a HTTP request the HHTP Handler is called with 3 values:
+-- 1) The detials of the socket used for the request -- TODO = check if it includes the client side details
+-- 2) The URL of the request
+-- 3) The details of the request
+-- then the handler can do some IO (any IO it likes) and 
+lambdaWarsHandler :: (IORef World) -> HTTP.Handler String
+lambdaWarsHandler worldRef = \statusCode url request ->
             case rqMethod request of
                 GET -> case (uriPath $ rqURI request) of
                             "/world.svg" -> do
-                                                t <- todo
-                                                world <- todo
-                                                return (sendSVG OK (renderWorldToSvg world))
-                            otherwise -> return (sendHTML OK todo)
+                                                modifyIORef worldRef stepWorld -- Run 1 step of game
+                                                nextWorld <- readIORef worldRef -- read the new world
+                                                return (sendSVG OK (renderWorldToSvg nextWorld))
+                                                                        -- TODO  Add time to SVG rendering
+                            otherwise -> return (sendHTML OK homePage)
                 otherwise -> return (sendHTML NotFound $ thehtml noHtml)
 
 -- Game Helper Functions
@@ -69,3 +79,30 @@ sendText statusCode txt = insertHeader HdrContentLength (show (length encodedTxt
               $ insertHeader HdrContentEncoding "text/plain"
               $ (respond statusCode :: Response String) { rspBody = encodedTxt }
   where encodedTxt = UTF8.encodeString txt
+
+-- Html for home page, including the JavaScript
+
+homePage =
+        thehtml <<
+            (header << Html [jQueryLink, renderScript]
+            +++ body << noHtml)
+            
+scriptLink :: String -> HtmlElement
+scriptLink link = scriptTag [("src", link)] ""
+
+inlineScript :: String -> HtmlElement
+inlineScript code = scriptTag [] code
+
+scriptTag :: [(String, String)] -> String -> HtmlElement
+scriptTag attrs content =
+        HtmlTag "SCRIPT" (map mkAttr attrs) (Html [HtmlString content])
+    where mkAttr (n, v) = HtmlAttr n v
+
+jQueryLink = scriptLink "https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"
+
+renderScript = inlineScript
+    ("$.ajaxSetup ({ cache: false });" ++
+        "$(function() { function render() { " ++
+        "$.get(\"/world.svg\", function(svg) { " ++ 
+        "$(\"body\").html(svg.documentElement); }); } " ++
+        "setInterval(render, 50); });")
