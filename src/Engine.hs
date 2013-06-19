@@ -106,7 +106,7 @@ vLength vector = sqrt $ vdot vector vector
 
 -- | TODO Return true if the bots are colliding 
 botBotCollision :: BotState -> BotState -> Bool
-botBotCollision bot1 bot2 = (>10) . vLength $ pos bot1 - pos bot2
+botBotCollision bot1 bot2 = (<10) . vLength $ pos bot1 - pos bot2
   where pos = get botPosition
 
 -- | Returns true if this bot is colliding with a wall
