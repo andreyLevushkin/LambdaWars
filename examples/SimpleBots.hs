@@ -23,3 +23,5 @@ runInCircle = do
   runInCircle
   
   
+fireBot :: Bot a
+fireBot = forever cmdFire

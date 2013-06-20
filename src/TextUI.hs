@@ -21,7 +21,7 @@ gameLoop world = do
 createWorld :: IO World
 createWorld = do
     gen <- getStdGen
-    let bots = [rammingBot, searchAndFire, searchAndFire, runInCircle]
+    let bots = [rammingBot, searchAndFire, searchAndFire, runInCircle, fireBot]
     return (newWorld gen bots)
 
 display :: Pretty a => a -> IO()
