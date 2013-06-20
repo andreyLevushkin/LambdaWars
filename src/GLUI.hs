@@ -90,7 +90,11 @@ drawWorld :: GLUI -> IORef World -> IO ()
 drawWorld glui worldRef = do
     (World  bots bullets _) <- readIORef worldRef
 
+    -- This sets the color of the battlefield background
+    clearColor $= (Color4 0 0 0 1)
+
     clear [ColorBuffer,DepthBuffer] 
+    
     texture Texture2D $= Enabled
     blend             $= Enabled
     blendFunc         $= (SrcAlpha, OneMinusSrcAlpha)
