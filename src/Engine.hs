@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
+
 module Engine where
 
 import System.Random
@@ -44,14 +46,16 @@ instance Random BotState where
   random = runRand $ do 
     position <- getRandomR (Vector2 0 0, Vector2 arenaWidth arenaHeight)
     let zero = Vector2 0 0
-      in return $ BotState position zero zero zero NoAction
+        unit = Vector2 1 0
+      in return $ BotState position zero unit unit NoAction
                           
   randomR (from, to)   = runRand $ let zero  = Vector2 0 0
+                                       unit  = Vector2 1 0
                                        fromP = get botPosition from :: Point
                                        toP   = get botPosition to
                                    in do 
                                      position <- getRandomR (fromP, toP)
-                                     return $ BotState position zero zero zero NoAction
+                                     return $ BotState position zero unit unit NoAction
                                    
 -- |Generates non overlapping bot states, we don't want to start with collisions
 instance Random [BotState] where
@@ -64,6 +68,7 @@ instance Random [BotState] where
                        where 
                         (next, gNext) = random g
               
+  randomR (from, to)   = undefined -- TODO - replace with better definition
               
 -- | Ensure that the bot can't turn by more then permitted by the rules etc.
 sanitizeCommand :: Command -> Command
@@ -87,7 +92,8 @@ stepBotState cmd = apply cmd . moveBot
     apply (Turn       degrees) = modify botVelocity $ rotate degrees   
     apply (MoveTurret degrees) = modify botTurret   $ rotate degrees     
     apply (MoveRadar  degrees) = modify botRadar    $ rotate degrees 
-    apply _ = id    
+    apply _                    = id
+
     moveBot state = modify botPosition (+ get botVelocity state) state
 
 -- | Gather up all the Fire commands issued by bots and create bullets for them.
@@ -98,8 +104,11 @@ bulletsFired bots = map (fire . snd) $ filter hasFired bots
 -- | Returns a bullet traveling the direction the bot turret is pointing
 fire :: BotState -> Bullet
 fire state = Bullet position velocity 
-  where position = get botPosition state
-        velocity = vnormalise (get botTurret state) |* (fromInteger bulletSpeed)
+  where
+  -- When setting the position make sure the bullet starts off outside the bot
+  position      = get botPosition state + ((botSize / 2 + 1) *|  unit_velocity) 
+  velocity      = unit_velocity |* (fromInteger bulletSpeed)
+  unit_velocity = vnormalise (get botTurret state)
 
 vLength :: Vector2 -> Double
 vLength vector = sqrt $ vdot vector vector

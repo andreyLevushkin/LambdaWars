@@ -20,11 +20,11 @@ runInCircle :: Bot a
 runInCircle = do
   cmdAccelerate 1
   cmdTurn 5
-  runInCircle
-  
+  runInCircle  
 
 fireBot :: Bot a 
 fireBot = forever cmdFire  
 
 sittingDuck :: Bot a
 sittingDuck = forever (cmdTurnTurret 1)  
+

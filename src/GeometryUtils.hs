@@ -32,3 +32,15 @@ radiansToDegrees = (*) (180 / (realToFrac pi))
 xAxisVector = Vector2 1 0 
 
 yAxisVector = Vector2 0 1
+    
+
+-- Examples
+
+demoBBox2 = bound_corners (Vector2 100 100) (Vector2 500 500)
+
+demoShrink = shrink 10 demoBBox2
+
+-- Assuming x = 0 and y = 0 is in the top-left, x axis is left-to-right
+-- and y axis is top-to-bottom. Then point is 100 right of top left.
+-- demoRotate is a clock-wise rotatation by 45 degress. 
+demoRotate = rotate (Degrees 45) (Vector2 100 0)
