@@ -118,9 +118,13 @@ botBotCollision :: BotState -> BotState -> Bool
 botBotCollision bot1 bot2 = (>10) . vLength $ pos bot1 - pos bot2
   where pos = get botPosition
 
--- | Returns true if this bot is colliding with a wall
-botWallCollision :: BotState -> Bool
-botWallCollision state =  (get botPosition state) `within_bounds` shrink 10 arenaBBox 
+-- | Returns false if this bot is colliding with a wall
+isNotWallCollision :: BotState -> Bool
+isNotWallCollision state = x > halfBot && y > halfBot 
+                            && x < arenaWidth - halfBot && y < arenaHeight - halfBot
+    where 
+      (Vector2 x y) = (get botPosition state) 
+      halfBot       = botSize / 2
 
 -- TODO scan results and collision results
 newDashBoard :: [BotState] -> BotState -> DashBoard
@@ -142,7 +146,9 @@ stepWorld (World bots bullets bbox) = World survivors newBullets bbox
 --   for example hit or collided with walls.
 pruneDeadBots :: [Bullet]  -> [(Automaton, BotState)] -> [(Automaton, BotState)]
 pruneDeadBots bullets bots = bulletSurvivors
-  where bulletSurvivors = filter (\bot->all (isNotBulletHit bot) bullets) bots
+  where 
+    bulletSurvivors = filter (\bot->all (isNotBulletHit bot) bullets) wallSurviros
+    wallSurviros    = filter (isNotWallCollision . snd) bots
 
 -- | TODO - For now this assumes the bots are circular which does not match the 
 --   the graphics so updating for square bots would be good.
