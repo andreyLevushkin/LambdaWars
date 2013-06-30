@@ -83,10 +83,9 @@ bound :: Ord a => a -> a -> a -> a
 bound x y = max x . min y
   
 -- | Create a new BotState given a command issued by the bot
-stepBotState :: Command -> BotState -> BotState
-stepBotState cmd = apply cmd . moveBot
+updateBotState :: (Command, BotState) -> BotState
+updateBotState (cmd, state) = apply cmd . moveBot $ state
   where
-    apply NoAction = id
     apply (Accelerate delta)   = modify botVelocity $ vmap (+delta)
     apply (Decelerate delta)   = modify botVelocity $ vmap (+ (-delta))
     apply (Turn       degrees) = modify botVelocity $ rotate degrees   
@@ -110,6 +109,7 @@ fire state = Bullet position velocity
   velocity      = unit_velocity |* (fromInteger bulletSpeed)
   unit_velocity = vnormalise (get botTurret state)
 
+-- | Returns the length of the vector
 vLength :: Vector2 -> Double
 vLength vector = sqrt $ vdot vector vector
 
@@ -129,16 +129,34 @@ newDashBoard otherBots bot = DashBoard NothingFound NoCollision (get botVelocity
 -- | TODO this function steps the world - 
 --   for now it does not hit test bullets or test for collisions
 stepWorld :: World -> World
-stepWorld (World bots bullets bbox) = World (zip newSteps newStates) newBullets bbox
+stepWorld (World bots bullets bbox) = World survivors newBullets bbox
   where         
-    steps      = map mkSteps bots
-    newBullets = map stepBullet $ bullets ++ bulletsFired steps
-    commands   = map (sanitizeCommand . stepCmd . fst) steps
-    newStates  = map (uncurry stepBotState ) $ zip commands $ map snd bots
-    newSteps   = map (stepNext . fst) steps
-    mkSteps bot@(automaton, state) = (step dashboard automaton, state)
-      where dashboard = newDashBoard otherBots state
-            otherBots = filter (== state) . map snd $ bots
+    steps       = map (stepBot bots) bots
+    newBullets  = map stepBullet $ bullets ++ bulletsFired steps
+    commands    = map (sanitizeCommand . stepCmd . fst) steps
+    newStates   = map updateBotState $ zip commands $ map snd bots
+    newAutomata = map (stepNext . fst) steps
+    survivors   = pruneDeadBots newBullets $ zip newAutomata newStates
+
+-- | Given a list of bots and bullets in flight prune out dead bots that are 
+--   for example hit or collided with walls.
+pruneDeadBots :: [Bullet]  -> [(Automaton, BotState)] -> [(Automaton, BotState)]
+pruneDeadBots bullets bots = bulletSurvivors
+  where bulletSurvivors = filter (\bot->all (isNotBulletHit bot) bullets) bots
+
+-- | TODO - For now this assumes the bots are circular which does not match the 
+--   the graphics so updating for square bots would be good.
+isNotBulletHit :: (Automaton, BotState) -> Bullet -> Bool
+isNotBulletHit (_, state) bullet = vLength bulletDistance > botSize
+  where bulletDistance = (get botPosition state) - (get bulletPosition bullet)
+
+-- | Given a list of all the bots in the world and a single bot. Steps a single 
+--   bot to generate a Step that can be incorporated into the world.
+--   Deals with generating the dashboard the bot uses for steps.
+stepBot :: [(Automaton, BotState)] -> (Automaton, BotState) -> (Step, BotState)
+stepBot bots bot@(automaton, state) = (step dashboard automaton, state)
+  where dashboard = newDashBoard otherBots state
+        otherBots = filter (== state) . map snd $ bots
             
 -- | Step bullet
 stepBullet :: Bullet -> Bullet                  

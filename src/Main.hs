@@ -12,7 +12,7 @@ main = glMain
 
 glMain = do
   gen <- getStdGen
-  let bots  = [runInCircle, sittingDuck, fireBot]
+  let bots  = [runInCircle, fireBot, fireBot, fireBot, fireBot, runInCircle]
   let world = (newWorld gen bots)
   showBattle world stepWorld
 

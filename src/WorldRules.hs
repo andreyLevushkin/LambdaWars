@@ -19,15 +19,15 @@ turretTurnRate :: Degrees Double
 turretTurnRate = 10
 
 -- |Max speed in pixles per tick
-maxSpeed       = 8
+maxSpeed       = 3
 
 -- |Max acceleration in pixels per tick per tick
 maxAcceleration :: Double
-maxAcceleration = 1
+maxAcceleration = 0.4
 
 -- |Max deceleration in pixels per tick per tick
 maxDeceleration :: Double
-maxDeceleration = 2
+maxDeceleration = 1
 
 -- |Width of the arena
 arenaWidth     = 800
