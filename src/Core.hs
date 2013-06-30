@@ -33,6 +33,26 @@ yield cmd = ContT $ \c -> return $ Step cmd (c ())
 step :: DashBoard -> Automaton -> Step
 step dash a = runReader a dash
 
+data MatchResult = Ongoing [String]
+                 | Draw
+                 | Won String
+                 deriving (Show)
+
+-- | This is a data type used to abstract the UI allowing us to have pluggable 
+--   UIs. For example we can have a web based UI using Snap or HTTP-server or 
+--   an OpenGL based UI. 
+-- 
+--   To create a new UI you will need to create an instance of this type. This 
+--   type contains a single function called runUI. It will get passwed the 
+--   initial state of the worl the function to step the world and a function to
+--   to check the status of the match. Using this info your implementation should 
+--   display the match and when it's over return the result.
+-- 
+--   The Engine module requires a UI to display the bot match.
+newtype UI = UI { 
+    runUI :: World -> (World -> World) -> (World -> MatchResult) -> IO MatchResult 
+  } 
+
 -- | this is the dashboard of readings, ie. the bots view
 -- the bot is provided a new set of readings every step
 data DashBoard = DashBoard {
@@ -49,6 +69,7 @@ type Direction = Vector2
 
 -- | this is the full state that we keep for each bot
 data BotState = BotState {
+  _botName     :: String,
   _botPosition :: Point,
   _botVelocity :: Point,
   _botTurret   :: Direction,
@@ -118,6 +139,9 @@ pad c count input = input ++ (take padLength $ repeat c)
 class Pretty a where
   ppr :: a -> Doc
 
+instance Pretty String where
+  ppr = text 
+
 instance Pretty Command where
   ppr = text . show
 
@@ -125,11 +149,12 @@ instance Pretty Vector2 where
   ppr (Vector2 x y) = column $ "(x:" ++ (printf "%.2f" x) ++ ", y:" ++ (printf "%.2f" y) ++ ")"
 
 instance Pretty BotState where
-  ppr (BotState position velocity turret radar lastCmd) 
-    = (ppr position) <+> (ppr velocity) <+> (ppr turret) <+> (ppr radar) <+> (ppr lastCmd)
+  ppr (BotState name position velocity turret radar lastCmd) 
+    = (ppr name) <+> (ppr position) <+> (ppr velocity) <+> (ppr turret) <+> (ppr radar) <+> (ppr lastCmd)
 
 instance Pretty [BotState] where
-  ppr bots = vcat $ (column "Position" <+> 
+  ppr bots = vcat $ (column "Name"      <+>
+                     column "Position"  <+> 
                      column "Velocity"  <+> 
                      column "Turret"    <+> 
                      column "Radar"     <+> 

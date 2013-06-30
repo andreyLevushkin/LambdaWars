@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
 
-module Engine where
+module Engine (runBattle) where
 
 import System.Random
 import Control.Monad.Random
@@ -47,7 +47,7 @@ instance Random BotState where
     position <- getRandomR (Vector2 0 0, Vector2 arenaWidth arenaHeight)
     let zero = Vector2 0 0
         unit = Vector2 1 0
-      in return $ BotState position zero unit unit NoAction
+      in return $ BotState "" position zero unit unit NoAction
                           
   randomR (from, to)   = runRand $ let zero  = Vector2 0 0
                                        unit  = Vector2 1 0
@@ -55,7 +55,7 @@ instance Random BotState where
                                        toP   = get botPosition to
                                    in do 
                                      position <- getRandomR (fromP, toP)
-                                     return $ BotState position zero unit unit NoAction
+                                     return $ BotState "" position zero unit unit NoAction
                                    
 -- |Generates non overlapping bot states, we don't want to start with collisions
 instance Random [BotState] where
@@ -168,18 +168,35 @@ stepBot bots bot@(automaton, state) = (step dashboard automaton, state)
 stepBullet :: Bullet -> Bullet                  
 stepBullet bullet = modify bulletPosition (+ get bulletVelocity bullet) bullet
 
--- | Returns true if the match is over
-matchIsOver :: World -> Bool  
-matchIsOver (World bots _  _) = length bots < 2
+-- | Returns the match result for a given world 
+--   
+matchIsOver :: World -> MatchResult  
+matchIsOver (World bots _  _) = case bots of
+    (_, winner):[] -> Won $ get botName winner
+    []             -> Draw 
+    _              -> Ongoing . map  (get botName) . snd . unzip $ bots
   
--- | Generate a new random world with the supplied bots                                
-newWorld :: RandomGen g => g -> [Bot a] -> World
-newWorld gen bots = World (zip automata states) [] arenaBBox
-  where states   = take (length bots) . fst $ random gen
-        automata = map start bots                       
-        zero     = Vector2 0 0
+-- | Generate a new random world with the supplied bots. The string in the tuple 
+--   gives each bot a name.                              
+newWorld :: RandomGen g => g -> [(String, Bot a)] -> World
+newWorld gen namedBots = World (zip automata states) [] arenaBBox
+  where 
+    (names, bots) = unzip namedBots
+    states        = take (length bots) . fst $ random gen
+    namedStates   = map  (uncurry $ set botName) $ zip names states
+    automata      = map start bots                       
 
-  
+-- | This is the only function exported by this module. Given a UI and a list of 
+--   bots it plays out the battle using the UI and then prints out the final 
+--   result.
+runBattle :: UI -> [(String, Bot a)] -> IO ()
+runBattle ui bots = do
+  gen <- getStdGen
+  let world = newWorld gen bots
+  result <- runUI ui world stepWorld matchIsOver
+  putStrLn $ "Match result is:" ++ show result
+
+
   
   
   

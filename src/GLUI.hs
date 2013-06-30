@@ -1,4 +1,4 @@
-module GLUI (showBattle, showTestWorld) where
+module GLUI (openGLUI) where
 
 import Graphics.Rendering.OpenGL 
 import Graphics.UI.GLUT
@@ -15,6 +15,7 @@ import System.IO
 import Foreign.Marshal.Alloc
 import Foreign.Ptr
 
+import Control.Exception as E
 
 import Paths_LambdaWars
 import Core
@@ -23,8 +24,6 @@ import GeometryUtils (xAxisVector, radiansToDegrees, angleDegrees)
 import qualified GeometryUtils as Geom
 
 import SimpleBots
-
-
 
 -- | The type to contain all the OpenGL drawing state
 data GLUI = GLUI {
@@ -40,8 +39,8 @@ arenaWidthP = realToFrac arenaWidth
 
 -- | This is the main function in this module. Pass in the initial world
 --   to draw and a world step function to update the world on every turn.
-showBattle :: World -> (World -> World) -> IO ()
-showBattle initial stepper = do
+openGLUI :: UI 
+openGLUI = UI $ \initial stepper resultCheck -> do
     putStrLn "Press SPACE to step through the battle and 'q' to quit." 
     (progname, _) <- getArgsAndInitialize
     
@@ -60,18 +59,22 @@ showBattle initial stepper = do
     displayCallback  $= (drawWorld glui worldState) 
     keyboardCallback $= (Just $ keyPressed worldState stepper)
 
-    mainLoop    
+    mainLoop 
+
+    -- It's impossible to leave the GLUT main loop so we don't bother returning 
+    -- anything useful here.
+    return undefined
 
 -- | This function is here to help debug the bot display.
 --   It draws a collection of bots on screen 
-showTestWorld :: IO ()
-showTestWorld = showBattle world id
+showTestWorld :: IO MatchResult
+showTestWorld = runUI openGLUI world id (const (Ongoing []))
     where
         world      = World bots bullets arenaBBox 
         bots       = zip (repeat (start sittingDuck)) $ map mkState [0..20]
         bullets    = map mkBullet [0..10]
         mkBullet n = Bullet (V.Vector2 (n * 10) 200) (V.Vector2 1 1 )
-        mkState n  = BotState position velocity turret radar Fire
+        mkState n  = BotState "" position velocity turret radar Fire
             where
                 position = (V.Vector2 (n * 20) (n * 20))
                 velocity = (V.Vector2 0 0)
@@ -106,7 +109,7 @@ drawWorld glui worldRef = do
 
 -- | Draw a bot
 drawBot :: GLUI -> BotState -> IO ()    
-drawBot glui (BotState position velocity turretDirection radarDirection _) = do
+drawBot glui (BotState _ position velocity turretDirection radarDirection _) = do
     preservingMatrix $ do 
         translate $ vectorToVector3 position
         rotateZ   $ angleDegrees velocity xAxisVector
