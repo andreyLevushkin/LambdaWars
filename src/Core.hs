@@ -124,7 +124,7 @@ columnWidth :: Int
 columnWidth = 20
 
 lineWidth :: Int
-lineWidth = columnWidth * 5
+lineWidth = columnWidth * 6
 
 column :: String -> Doc
 column = text . pad ' ' columnWidth
@@ -150,7 +150,7 @@ instance Pretty Vector2 where
 
 instance Pretty BotState where
   ppr (BotState name position velocity turret radar lastCmd) 
-    = (ppr name) <+> (ppr position) <+> (ppr velocity) <+> (ppr turret) <+> (ppr radar) <+> (ppr lastCmd)
+    = (column name) <+> (ppr position) <+> (ppr velocity) <+> (ppr turret) <+> (ppr radar) <+> (ppr lastCmd)
 
 instance Pretty [BotState] where
   ppr bots = vcat $ (column "Name"      <+>

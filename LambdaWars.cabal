@@ -36,6 +36,7 @@ executable LambdaWars
                , AC-Vector-Fancy
                , AC-Angle
                , fclabels
+               , time
                , OpenGL
                , GLUT
                , pretty

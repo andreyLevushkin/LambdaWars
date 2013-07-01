@@ -9,6 +9,8 @@ import qualified Data.Vector.V2 as V
 import Data.IORef ( IORef, newIORef, writeIORef, readIORef, modifyIORef)
 import Control.Applicative 
 
+import Data.Time.Clock
+
 import Data.Angle
 
 import System.IO
@@ -28,7 +30,10 @@ import SimpleBots
 -- | The type to contain all the OpenGL drawing state
 data GLUI = GLUI {
     hullTexture   :: TextureObject,
-    turretTexture :: TextureObject
+    turretTexture :: TextureObject,
+    worldStepper  :: World -> World,
+    isMatchOver   :: World -> MatchResult,
+    world         :: IORef World
 }
 
 arenaHeightP :: GLfloat
@@ -37,12 +42,15 @@ arenaHeightP = realToFrac arenaHeight
 arenaWidthP :: GLfloat
 arenaWidthP = realToFrac arenaWidth
 
+
+-- | The rate at which the game plays in frames per second. 
+fps = 15
+
 -- | This is the main function in this module. Pass in the initial world
 --   to draw and a world step function to update the world on every turn.
 openGLUI :: UI 
 openGLUI = UI $ \initial stepper resultCheck -> do
-    putStrLn "Press SPACE to step through the battle and 'q' to quit." 
-    (progname, _) <- getArgsAndInitialize
+    getArgsAndInitialize
     
     createWindow "Lambda Wars"
 
@@ -54,16 +62,53 @@ openGLUI = UI $ \initial stepper resultCheck -> do
     translate $ Vector3 (-arenaHeightP/2) (-arenaWidthP/2) 0
 
     worldState <- newIORef initial
-    glui       <- initRender
+    (bodyTexture, turretTexture) <- loadAllTextures
+
+    let glui = GLUI bodyTexture turretTexture stepper resultCheck worldState
 
     displayCallback  $= (drawWorld glui worldState) 
     keyboardCallback $= (Just $ keyPressed worldState stepper)
+
+    timeRef <- getCurrentTime >>= newIORef 
+
+    idleCallback $= Just (onIdle glui timeRef)
 
     mainLoop 
 
     -- It's impossible to leave the GLUT main loop so we don't bother returning 
     -- anything useful here.
     return undefined
+
+onIdle :: GLUI -> IORef UTCTime ->  IO ()
+onIdle glui lastFrameRef = do
+    lastFrame <- readIORef lastFrameRef 
+    now       <- getCurrentTime
+
+    let sinceLastFrame = realToFrac $ now `diffUTCTime` lastFrame
+    if sinceLastFrame < (1/fps)
+        then return ()
+        else do
+            writeIORef lastFrameRef now
+            modifyIORef (world glui) (worldStepper glui)
+            postRedisplay Nothing
+            tryWinning glui
+
+-- | Check if the match is over and notify the user if it is.
+tryWinning :: GLUI -> IO ()
+tryWinning glui = do
+    world <- readIORef (world glui)
+    case isMatchOver glui world of 
+        Draw     -> do 
+            putStrLn "The match is a draw" 
+            idleCallback $= Nothing
+
+        Won name -> do 
+            putStrLn $ "The winnder is:" ++ name
+            idleCallback $= Nothing
+            
+        _        -> return ()
+
+
 
 -- | This function is here to help debug the bot display.
 --   It draws a collection of bots on screen 
@@ -81,13 +126,16 @@ showTestWorld = runUI openGLUI world id (const (Ongoing []))
                 turret   = Geom.rotate (Degrees (10 * n)) (V.Vector2 1 0)
                 radar    = Geom.rotate (Degrees (-10 * n)) (V.Vector2 1 0)
 
-initRender :: IO GLUI
-initRender = do
+loadAllTextures :: IO (TextureObject, TextureObject)
+loadAllTextures = do
     bodyTexturePath   <- getDataFileName "resources/body.tex"
     turretTexturePath <- getDataFileName "resources/turret.tex"
-    GLUI 
-      <$> loadTexture (TextureSize2D 36 36) bodyTexturePath
-      <*> loadTexture (TextureSize2D 20 54) turretTexturePath
+    
+    bodyTexture       <- loadTexture (TextureSize2D 36 36) bodyTexturePath
+    turretTexture     <- loadTexture (TextureSize2D 20 54) turretTexturePath
+
+    return (bodyTexture, turretTexture)
+
 
 drawWorld :: GLUI -> IORef World -> IO ()    
 drawWorld glui worldRef = do

@@ -179,7 +179,7 @@ matchIsOver (World bots _  _) = case bots of
 -- | Generate a new random world with the supplied bots. The string in the tuple 
 --   gives each bot a name.                              
 newWorld :: RandomGen g => g -> [(String, Bot a)] -> World
-newWorld gen namedBots = World (zip automata states) [] arenaBBox
+newWorld gen namedBots = World (zip automata namedStates) [] arenaBBox
   where 
     (names, bots) = unzip namedBots
     states        = take (length bots) . fst $ random gen
