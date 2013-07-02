@@ -113,7 +113,7 @@ fire state = Bullet position velocity
 vLength :: Vector2 -> Double
 vLength vector = sqrt $ vdot vector vector
 
--- | TODO Return true if the bots are colliding 
+-- | Return true if the bots are colliding 
 botBotCollision :: BotState -> BotState -> Bool
 botBotCollision bot1 bot2 = (>10) . vLength $ pos bot1 - pos bot2
   where pos = get botPosition
@@ -126,12 +126,14 @@ isNotWallCollision state = x > halfBot && y > halfBot
       (Vector2 x y) = (get botPosition state) 
       halfBot       = botSize / 2
 
--- TODO scan results and collision results
+-- TODO This should return a Dashboard for a given bot with scan results and 
+--  collision results
 newDashBoard :: [BotState] -> BotState -> DashBoard
 newDashBoard otherBots bot = DashBoard NothingFound NoCollision (get botVelocity bot) 
 
 -- | TODO this function steps the world - 
 --   for now it does not hit test bullets or test for collisions
+--  TODO remove bullets that go outside the arena from the world.
 stepWorld :: World -> World
 stepWorld (World bots bullets bbox) = World survivors newBullets bbox
   where         
@@ -187,14 +189,12 @@ newWorld gen namedBots = World (zip automata namedStates) [] arenaBBox
     automata      = map start bots                       
 
 -- | This is the only function exported by this module. Given a UI and a list of 
---   bots it plays out the battle using the UI and then prints out the final 
---   result.
+--   bots it plays out the battle using the UI 
 runBattle :: UI -> [(String, Bot a)] -> IO ()
 runBattle ui bots = do
   gen <- getStdGen
-  let world = newWorld gen bots
-  result <- runUI ui world stepWorld matchIsOver
-  putStrLn $ "Match result is:" ++ show result
+  runUI ui (newWorld gen bots) stepWorld matchIsOver
+
 
 
   

@@ -38,6 +38,10 @@ data MatchResult = Ongoing [String]
                  | Won String
                  deriving (Show)
 
+isFinished :: MatchResult -> Bool
+isFinished (Ongoing _) = False
+isFinished _           = True
+
 -- | This is a data type used to abstract the UI allowing us to have pluggable 
 --   UIs. For example we can have a web based UI using Snap or HTTP-server or 
 --   an OpenGL based UI. 
@@ -50,7 +54,7 @@ data MatchResult = Ongoing [String]
 -- 
 --   The Engine module requires a UI to display the bot match.
 newtype UI = UI { 
-    runUI :: World -> (World -> World) -> (World -> MatchResult) -> IO MatchResult 
+    runUI :: World -> (World -> World) -> (World -> MatchResult) -> IO () 
   } 
 
 -- | this is the dashboard of readings, ie. the bots view

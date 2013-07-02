@@ -75,10 +75,6 @@ openGLUI = UI $ \initial stepper resultCheck -> do
 
     mainLoop 
 
-    -- It's impossible to leave the GLUT main loop so we don't bother returning 
-    -- anything useful here.
-    return undefined
-
 onIdle :: GLUI -> IORef UTCTime ->  IO ()
 onIdle glui lastFrameRef = do
     lastFrame <- readIORef lastFrameRef 
@@ -112,7 +108,7 @@ tryWinning glui = do
 
 -- | This function is here to help debug the bot display.
 --   It draws a collection of bots on screen 
-showTestWorld :: IO MatchResult
+showTestWorld :: IO ()
 showTestWorld = runUI openGLUI world id (const (Ongoing []))
     where
         world      = World bots bullets arenaBBox 
