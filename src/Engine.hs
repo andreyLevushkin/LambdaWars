@@ -127,7 +127,7 @@ isNotWallCollision state = x > halfBot && y > halfBot
       halfBot       = botSize / 2
 
 -- TODO This should return a Dashboard for a given bot with scan results and 
---  collision results
+--  collision results -- MOST IMPORTANT MISSING PIECE
 newDashBoard :: [BotState] -> BotState -> DashBoard
 newDashBoard otherBots bot = DashBoard NothingFound NoCollision (get botVelocity bot) 
 

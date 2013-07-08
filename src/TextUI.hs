@@ -1,4 +1,4 @@
-module TextUI where
+module TextUI (textUI) where
 
 import SimpleBots
 import Engine
@@ -6,23 +6,25 @@ import Core
 import System.Random
 import Text.PrettyPrint
 
-gameUI :: IO()
-gameUI = do
-    firstWorld <- createWorld
-    gameLoop firstWorld
+import System.Exit
 
-gameLoop :: World -> IO ()
-gameLoop world = do
-    display world
-    input <- getLine -- pause. TODO = Get a number turns to run or Q to exit
-    let nextWorld = stepWorld world
-    gameLoop nextWorld
-    
-createWorld :: IO World
-createWorld = do
-    gen <- getStdGen
-    let bots = [rammingBot, searchAndFire, searchAndFire, runInCircle, fireBot]
-    return (newWorld gen bots)
+textUI :: UI
+textUI = UI $ \world stepper matchResult -> do
 
-display :: Pretty a => a -> IO()
-display = putStrLn . render . ppr
+    -- Create a list of all the states in the match   
+    let states =  iterate stepper world
+
+    -- Print out the list of states to screen
+    mapM_ (display matchResult) states
+
+display :: (World -> MatchResult) -> World -> IO ()
+display matchResult  world  = do
+    print world 
+    putStrLn  "Press ENTER to continue."
+    getLine
+    if (isFinished . matchResult) world
+        then finish (matchResult world)
+        else return ()
+
+finish :: MatchResult -> IO ()
+finish result = print result >> exitSuccess
