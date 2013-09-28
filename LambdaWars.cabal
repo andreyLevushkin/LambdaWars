@@ -37,7 +37,7 @@ executable LambdaWars
                , AC-Angle
                , fclabels
                , time
-               , OpenGL
+               , OpenGL >= 2.9
                , GLUT
                , pretty
 
@@ -66,3 +66,4 @@ test-suite tests
                   , AC-Vector-Fancy
                   , AC-Angle
                   , fclabels
+                  , pretty
