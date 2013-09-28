@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cabal install && dist/build/LambdaWars/LambdaWars
+cabal install && LambdaWars_datadir=. dist/build/LambdaWars/LambdaWars
