@@ -247,7 +247,7 @@ loadTexture texSize path = do
     textureBinding Texture2D $= (Just name)
     tex <- loadTextureBuffer path
     let pixDat = PixelData RGBA UnsignedByte tex
-    texImage2D Nothing NoProxy 0 RGBA' texSize 0 pixDat
+    texImage2D Texture2D NoProxy 0 RGBA' texSize 0 pixDat
 
     textureFilter   Texture2D   $= ((Linear', Nothing), Linear') 
     textureWrapMode Texture2D S $= (Repeated, ClampToEdge)

@@ -37,7 +37,7 @@ executable LambdaWars
                , AC-Angle
                , fclabels
                , time
-               , OpenGL
+               , OpenGL >= 2.9
                , GLUT
                , pretty
 
@@ -55,9 +55,9 @@ test-suite tests
                   -- Duplication!
                   , blaze-svg
                   , mtl
-                  , snap-core ==0.9.2.2
-                  , snap-server ==0.9.2.4
-                  , bytestring ==0.9.2.1
+                  , snap-core >= 0.9.2.2
+                  , snap-server >= 0.9.2.4
+                  , bytestring
                   , directory
                   , random
                   , MonadRandom 
@@ -66,3 +66,4 @@ test-suite tests
                   , AC-Vector-Fancy
                   , AC-Angle
                   , fclabels
+                  , pretty
