@@ -7,7 +7,7 @@ import Control.Monad.Random
 import Control.Monad.Random.Class
 import Control.Monad.Loops
 import Data.List
-import Data.Label.Pure
+import Data.Label.Total
 import Debug.Trace
 
 -- Vectors
@@ -23,7 +23,6 @@ import Control.Applicative
 
 import Core
 import GeometryUtils
-import Data.Label.Pure
 import WorldRules
 import TupleUtils
 
