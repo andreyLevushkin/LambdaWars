@@ -35,7 +35,7 @@ executable LambdaWars
                , AC-Vector
                , AC-Vector-Fancy
                , AC-Angle
-               , fclabels
+               , fclabels >= 2.0
                , time
                , OpenGL >= 2.9
                , GLUT
