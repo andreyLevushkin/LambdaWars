@@ -6,3 +6,6 @@ cabal-dev
 *.chs.h
 .virthualenv
 /log/
+.stack-work
+.cabal-sandbox
+cabal.sandbox.config

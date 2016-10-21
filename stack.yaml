@@ -1,0 +1,14 @@
+resolver: lts-7.4 # for ghc 8.0.1
+#resolver: lts-6.22 # for ghc 7.10.3
+packages:
+    - '.'
+
+extra-deps:
+- AC-Angle-1.0
+- AC-Vector-Fancy-2.4.0
+
+
+flags: {}
+
+extra-package-dbs: []
+
