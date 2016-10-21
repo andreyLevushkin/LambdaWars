@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
 
 module Engine (runBattle) where
@@ -7,7 +8,12 @@ import Control.Monad.Random
 import Control.Monad.Random.Class
 import Control.Monad.Loops
 import Data.List
+
+#if MIN_VERSION_fclabels(2,0,0)
+import Data.Label
+#else
 import Data.Label.Pure
+#endif
 import Debug.Trace
 
 -- Vectors
@@ -23,7 +29,6 @@ import Control.Applicative
 
 import Core
 import GeometryUtils
-import Data.Label.Pure
 import WorldRules
 import TupleUtils
 
