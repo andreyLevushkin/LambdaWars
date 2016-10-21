@@ -1,4 +1,5 @@
-resolver: lts-7.4
+resolver: lts-7.4 # for ghc 8.0.1
+#resolver: lts-6.22 # for ghc 7.10.3
 packages:
     - '.'
 

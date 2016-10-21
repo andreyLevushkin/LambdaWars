@@ -7,3 +7,5 @@ cabal-dev
 .virthualenv
 /log/
 .stack-work
+.cabal-sandbox
+cabal.sandbox.config
